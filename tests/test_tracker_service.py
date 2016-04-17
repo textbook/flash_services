@@ -40,7 +40,7 @@ def test_get_velocity_success(get, service):
 
     get.assert_called_once_with(
         ('https://www.pivotaltracker.com/services/v5/projects/123/'
-         'iterations/456?fields=:default,velocity,stories'),
+         'iterations/456?fields=%3Adefault%2Cvelocity%2Cstories'),
         headers={'X-TrackerToken': 'foobar'},
     )
     assert result == {'velocity': 10, 'stories': {'foo': 5}}
@@ -75,7 +75,7 @@ def test_get_velocity_failure(get, error, service):
 
     get.assert_called_once_with(
         ('https://www.pivotaltracker.com/services/v5/projects/123/'
-         'iterations/456?fields=:default,velocity,stories'),
+         'iterations/456?fields=%3Adefault%2Cvelocity%2Cstories'),
         headers={'X-TrackerToken': 'foobar'},
     )
     assert result == {}

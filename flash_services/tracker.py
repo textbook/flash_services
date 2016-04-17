@@ -47,8 +47,8 @@ class Tracker(HeaderMixin, Service):
         """
         url = self.url_builder(
             '/projects/{id}/iterations/{number}',
-            {'number': iteration, 'id': self.project_id},
-            {'fields': ':default,velocity,stories'},
+            params={'number': iteration, 'id': self.project_id},
+            url_params={'fields': ':default,velocity,stories'},
         )
         response = requests.get(url, headers=self.headers)
         if response.status_code == 200:
@@ -79,7 +79,7 @@ class Tracker(HeaderMixin, Service):
         return result
 
     def update(self):
-        url = self.url_builder('/projects/{id}', {'id': self.project_id})
+        url = self.url_builder('/projects/{id}', params={'id': self.project_id})
         logger.debug('fetching Tracker project data')
         response = requests.get(url, headers=self.headers)
         if response.status_code == 200:

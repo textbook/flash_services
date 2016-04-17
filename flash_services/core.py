@@ -2,6 +2,7 @@
 
 from abc import ABCMeta, abstractmethod
 from datetime import datetime
+from urllib.parse import urlencode
 
 from .utils import naturaldelta
 
@@ -32,11 +33,13 @@ class Service(metaclass=ABCMeta):
         """Get the headers for the service requests."""
         return {}
 
-    def url_builder(self, endpoint, params=None, url_params=None):
+    def url_builder(self, endpoint, *, root=None, params=None, url_params=None):
         """Create a URL for the specified endpoint.
 
         Arguments:
           endpoint (:py:class:`str`): The API endpoint to access.
+          root: (:py:class:`str`, optional): The root URL for the
+            service API.
           params: (:py:class:`dict`, optional): The values for format
             into the created URL (defaults to ``None``).
           url_params: (:py:class:`dict`, optional): Parameters to add
@@ -46,15 +49,12 @@ class Service(metaclass=ABCMeta):
           :py:class:`str`: The resulting URL.
 
         """
-        formatted_params = None
-        if url_params:
-            formatted_params = '&'.join(
-                ['{}={}'.format(key, val) for key, val in url_params.items()]
-            )
+        if root is None:
+            root = self.ROOT
         return ''.join([
-            self.ROOT,
+            root,
             endpoint,
-            '?' + formatted_params if formatted_params else ''
+            '?' + urlencode(url_params) if url_params else '',
         ]).format(**params or {})
 
     @classmethod

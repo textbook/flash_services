@@ -12,7 +12,7 @@ from .tracker import Tracker
 from .travis import TravisOS
 
 __author__ = 'Jonathan Sharpe'
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 
 blueprint = Blueprint('services', __name__, template_folder='templates')
 

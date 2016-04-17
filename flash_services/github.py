@@ -56,11 +56,12 @@ class GitHub(UrlParamMixin, Service):
 
     def update(self):
         logger.debug('fetching GitHub project data')
+        url_prm = OrderedDict(sha=self.branch) if self.branch else OrderedDict()
         response = requests.get(
             self.url_builder(
                 '/repos/{repo}/commits',
-                {'repo': self.repo_name},
-                OrderedDict(sha=self.branch) if self.branch else OrderedDict(),
+                params={'repo': self.repo_name},
+                url_params=url_prm,
             ),
             headers=self.headers,
         )

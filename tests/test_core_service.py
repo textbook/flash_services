@@ -28,25 +28,26 @@ def test_required_config(config):
         Test.from_config(**config)
 
 
-@pytest.mark.parametrize('input_, expected', [
-    (('/endpoint',), 'root/url/endpoint'),
-    (('/endpoint/{foo}', {'foo': 'bar'}), 'root/url/endpoint/bar'),
-    (('/endpoint', {}, {'foo': 'bar'}), 'root/url/endpoint?foo=bar'),
+@pytest.mark.parametrize('args, kwargs, expected', [
+    (('/endpoint',), {}, 'root/url/endpoint'),
+    (('/endpoint/{foo}',), {'params': {'foo': 'bar'}}, 'root/url/endpoint/bar'),
+    (('/endpoint',), {'url_params': {'foo': 'bar'}}, 'root/url/endpoint?foo=bar'),
     (
-        ('/endpoint', {}, OrderedDict([('foo', 'bar'), ('bar', 'baz')])),
+        ('/endpoint',),
+        {'url_params': OrderedDict([('foo', 'bar'), ('bar', 'baz')])},
         'root/url/endpoint?foo=bar&bar=baz',
     ),
     (
-        (
-                '/endpoint/{hello}',
-                {'hello': 'world'},
-                OrderedDict([('foo', 'bar'), ('bar', 'baz')]),
-        ),
+        ('/endpoint/{hello}',),
+        {
+            'params': {'hello': 'world'},
+            'url_params': OrderedDict([('foo', 'bar'), ('bar', 'baz')]),
+        },
         'root/url/endpoint/world?foo=bar&bar=baz',
     ),
 ])
-def test_url_builder(input_, expected):
-    assert Test().url_builder(*input_) == expected
+def test_url_builder(args, kwargs, expected):
+    assert Test().url_builder(*args, **kwargs) == expected
 
 
 def test_build_estimate_unstarted():
