@@ -5,7 +5,7 @@ install:
 - pip install -r requirements.txt
 - pip install coveralls
 script:
-- coverage run --source=flash setup.py test
+- coverage run --source=flash_services setup.py test
 after_success: coveralls
 deploy:
   - provider: pypi
