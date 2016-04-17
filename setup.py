@@ -70,6 +70,7 @@ setup(
     long_description=long_description,
     name=PKG_NAME,
     packages=[PKG_NAME],
+    package_data={PKG_NAME: ['templates/**/*.html']},
     platforms='any',
     tests_require=[
         'pylint',
