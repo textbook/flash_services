@@ -19,39 +19,39 @@ class GitHub(UrlParamMixin, Service):
     Arguments:
       api_token (:py:class:`str`): A valid token for the GitHub API.
       account (:py:class:`str`): The name of the account.
-      app (:py:class:`str`): The name of the application.
+      repo (:py:class:`str`): The name of the repository.
       branch (:py:class:`str`, optional): The branch to get commit data
         from.
 
     Attributes:
-      repo (:py:class:`str`): The repository name, in the format
-        ``account/application``.
+      repo_name (:py:class:`str`): The repository name, in the format
+        ``account/repo``.
 
     """
 
     AUTH_PARAM = 'access_token'
-    REQUIRED = {'api_token', 'account', 'app'}
+    REQUIRED = {'api_token', 'account', 'repo'}
     ROOT = 'https://api.github.com'
     TEMPLATE = 'github'
 
-    def __init__(self, *, api_token, account, app, branch=None, **kwargs):
+    def __init__(self, *, api_token, account, repo, branch=None, **kwargs):
         super().__init__(api_token=api_token, **kwargs)
         self.account = account
-        self.app = app
+        self.repo = repo
         self.branch = branch
-        self.repo = '{}/{}'.format(account, app)
+        self.repo_name = '{}/{}'.format(account, repo)
 
     @property
     def name(self):
         """The full name of the repo, including branch if provided."""
         if self.branch:
-            return '{} [{}]'.format(self.repo, self.branch)
-        return self.repo
+            return '{} [{}]'.format(self.repo_name, self.branch)
+        return self.repo_name
 
     @property
     def headers(self):
         headers = super().headers
-        headers['User-Agent'] = self.app
+        headers['User-Agent'] = self.repo
         return headers
 
     def update(self):
@@ -59,7 +59,7 @@ class GitHub(UrlParamMixin, Service):
         response = requests.get(
             self.url_builder(
                 '/repos/{repo}/commits',
-                {'repo': self.repo},
+                {'repo': self.repo_name},
                 OrderedDict(sha=self.branch) if self.branch else OrderedDict(),
             ),
             headers=self.headers,

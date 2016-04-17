@@ -13,7 +13,7 @@ The following service definitions include the configuration options:
   * ``api_token`` (required),
   * ``account`` (required - the name of the account the project is in, e.g.
     ``"textbook"``)
-  * ``app`` (required - the name of the project application within that account,
+  * ``repo`` (required - the name of the project repository within that account,
     e.g. ``"flash"``)
   * ``branch`` (the name of the branch to show commits from, defaulting to the
     repository's default branch, which is usually ``master``).

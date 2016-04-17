@@ -9,12 +9,12 @@ from flash_services.github import GitHub
 
 @pytest.fixture
 def service():
-    return GitHub(api_token='foobar', account='foo', app='bar')
+    return GitHub(api_token='foobar', account='foo', repo='bar')
 
 
 @pytest.fixture
 def branched():
-    return GitHub(api_token='foobar', account='foo', app='bar', branch='baz')
+    return GitHub(api_token='foobar', account='foo', repo='bar', branch='baz')
 
 
 def test_tracker_service_type():
@@ -23,7 +23,7 @@ def test_tracker_service_type():
 
 def test_correct_config():
     assert GitHub.AUTH_PARAM == 'access_token'
-    assert GitHub.REQUIRED == {'api_token', 'account', 'app'}
+    assert GitHub.REQUIRED == {'api_token', 'account', 'repo'}
     assert GitHub.ROOT == 'https://api.github.com'
     assert GitHub.TEMPLATE == 'github'
 
