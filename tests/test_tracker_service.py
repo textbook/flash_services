@@ -50,9 +50,10 @@ def test_get_velocity_success(get, service):
 @mock.patch('flash_services.tracker.requests.get', **{
     'return_value.status_code': 200,
     'return_value.headers': {'X-Tracker-Project-Version': '1'},
-    'return_value.json.return_value': {'foo': 'bar'},
+    'return_value.json.return_value': {'foo': 'bar', 'current_iteration_number': 0},
 })
 def test_update_success(get, debug, service):
+    service.current_iteration = 1
     service.project_version = 2
     service._cached = {'foo': 'bar'}
 
@@ -105,6 +106,7 @@ def test_update_failure(get, error, service):
 })
 @mock.patch.object(Tracker, 'details')
 def test_update_details(details, get, debug, service):
+    service.current_iteration = 1
     service.project_version = 1
     service._cached = {'foo': 'bar'}
 
@@ -115,3 +117,31 @@ def test_update_details(details, get, debug, service):
         mock.call('fetching Tracker project data'),
         mock.call('project updated, fetching iteration details'),
     ])
+
+
+@pytest.mark.parametrize('version, iteration, get_details', [
+    (1, 1, False),
+    (1, 2, True),
+    (2, 1, True),
+    (2, 2, True),
+])
+@mock.patch('flash_services.tracker.requests.get', **{
+    'return_value.status_code': 200,
+})
+@mock.patch.object(Tracker, 'details')
+def test_update_cache(details, get, service, version, iteration, get_details):
+    get.configure_mock(**{
+        'return_value.headers': {'X-Tracker-Project-Version': version},
+        'return_value.json.return_value': {'current_iteration_number': iteration},
+    })
+    service._cached = {}
+    service.current_iteration = 1
+    service.project_version = 1
+
+    result = service.update()
+
+    if get_details:
+        details.assert_called_once_with(iteration)
+    else:
+        details.assert_not_called()
+        assert result is service._cached

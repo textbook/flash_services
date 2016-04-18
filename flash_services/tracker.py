@@ -31,6 +31,7 @@ class Tracker(HeaderMixin, Service):
 
     def __init__(self, *, api_token, project_id, **kwargs):
         super().__init__(api_token=api_token, **kwargs)
+        self.current_iteration = 0
         self.project_id = project_id
         self.project_version = 0
         self._cached = dict(name='unknown', velocity='unknown')
@@ -86,7 +87,9 @@ class Tracker(HeaderMixin, Service):
             new_version = int(response.headers.get(
                 'X-Tracker-Project-Version', 0,
             ))
-            if new_version > self.project_version:
+            new_iteration = int(response.json()['current_iteration_number'])
+            if (new_version > self.project_version or
+                    new_iteration > self.current_iteration):
                 raw_data = response.json()
                 data = {key: raw_data.get(key) for key in ['name', ]}
                 logger.debug('project updated, fetching iteration details')
