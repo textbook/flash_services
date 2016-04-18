@@ -1,10 +1,7 @@
 """Core service description."""
 
 from abc import ABCMeta, abstractmethod
-from datetime import datetime
 from urllib.parse import urlencode
-
-from .utils import naturaldelta
 
 
 class Service(metaclass=ABCMeta):
@@ -67,35 +64,3 @@ class Service(metaclass=ABCMeta):
             ))
         instance = cls(**config)
         return instance
-
-    @staticmethod
-    def estimate_time(current, previous):
-        """Update the current build with an estimated completion time.
-
-        Takes a simple average over the previous builds, using those
-        whose outcome is ``'passed'``.
-
-        Arguments:
-          current (:py:class:`dict`): The current build data.
-          previous (:py:class:`list`): All previous builds.
-
-        """
-        if current.get('started_at') is None:
-            current['elapsed'] = 'estimate not available'
-            return
-        usable = [
-            build for build in previous if build['outcome'] == 'passed' and
-            build['duration'] is not None
-        ]
-        if not usable:
-            current['elapsed'] = 'estimate not available'
-            return
-        average_duration = int(sum(build['duration'] for build in usable) /
-                               float(len(usable)))
-        finish = current['started_at'] + average_duration
-        remaining = (datetime.fromtimestamp(finish) -
-                     datetime.now()).total_seconds()
-        if remaining >= 0:
-            current['elapsed'] = '{} left'.format(naturaldelta(remaining))
-        else:
-            current['elapsed'] = 'nearly done'

@@ -5,7 +5,7 @@ import logging
 import requests
 
 from .core import Service
-from .utils import elapsed_time, health_summary, truncate
+from .utils import elapsed_time, estimate_time, health_summary, truncate
 
 logger = logging.getLogger(__name__)
 
@@ -79,8 +79,7 @@ class TravisOS(Service):
             self.format_build(build, commits.get(build.get('commit_id'), {}))
             for build in data.get('builds', [])
         ]
-        if builds and builds[0]['outcome'] == 'working':
-            self.estimate_time(builds[0], builds[1:])
+        estimate_time(builds)
         return dict(
             builds=builds[:4],
             health=health_summary(builds),

@@ -157,12 +157,49 @@ def health_summary(builds):
       :py:class:`str`: The health summary.
 
     """
-    for build in builds[:2]:
-        if build['outcome'] == 'working':
-            continue
+    for build in builds:
         if build['outcome'] == 'passed':
             return 'ok'
         elif build['outcome'] in ['failed', 'crashed']:
             return 'error'
-        break
+        else:
+            continue
     return 'neutral'
+
+
+def estimate_time(builds):
+    """Update the working build with an estimated completion time.
+
+    Takes a simple average over the previous builds, using those
+    whose outcome is ``'passed'``.
+
+    Arguments:
+      builds (:py:class:`list`): All builds.
+
+    """
+    try:
+        index, current = next(
+            (index, build) for index, build in enumerate(builds[:4])
+            if build['outcome'] == 'working'
+        )
+    except StopIteration:
+        return  # no in-progress builds
+    if current.get('started_at') is None:
+        current['elapsed'] = 'estimate not available'
+        return
+    usable = [
+        current for current in builds[index + 1:]
+        if current['outcome'] == 'passed' and current['duration'] is not None
+    ]
+    if not usable:
+        current['elapsed'] = 'estimate not available'
+        return
+    average_duration = int(sum(build['duration'] for build in usable) /
+                           float(len(usable)))
+    finish = current['started_at'] + average_duration
+    remaining = (datetime.fromtimestamp(finish) -
+                 datetime.now()).total_seconds()
+    if remaining >= 0:
+        current['elapsed'] = '{} left'.format(naturaldelta(remaining))
+    else:
+        current['elapsed'] = 'nearly done'

@@ -5,7 +5,7 @@ import requests
 
 from .auth import UrlParamMixin
 from .core import Service
-from .utils import elapsed_time, health_summary, truncate
+from .utils import elapsed_time, estimate_time, health_summary, truncate
 
 logger = logging.getLogger(__name__)
 
@@ -59,8 +59,7 @@ class Codeship(UrlParamMixin, Service):
 
         """
         builds = [cls.format_build(build) for build in data.get('builds', [])]
-        if builds and builds[0]['outcome'] == 'working':
-            cls.estimate_time(builds[0], builds[1:])
+        estimate_time(builds)
         return dict(
             builds=builds[:4],
             health=health_summary(builds),

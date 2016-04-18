@@ -3,8 +3,8 @@ from unittest import mock
 
 import pytest
 
-from flash_services.utils import (elapsed_time, friendlier, health_summary,
-                                  occurred, truncate)
+from flash_services.utils import (elapsed_time, estimate_time, friendlier,
+                                  health_summary, occurred, truncate)
 
 TWO_DAYS_AGO = datetime.now() - timedelta(days=2, hours=12)
 
@@ -77,3 +77,60 @@ def test_numeric_words(text, expected):
 ])
 def test_health_summary(builds, health):
     assert health_summary(builds) == health
+
+
+def test_build_estimate_unstarted():
+    current = {'started_at': None, 'outcome': 'working'}
+
+    estimate_time([current])
+
+    assert current['elapsed'] == 'estimate not available'
+
+
+def test_build_estimate_no_history():
+    current = {'started_at': 123456789, 'outcome': 'working'}
+
+    estimate_time([current])
+
+    assert current['elapsed'] == 'estimate not available'
+
+
+def test_build_estimate_usable():
+    builds = [
+        {'started_at': int(datetime.now().timestamp()), 'outcome': 'working'},
+        {'outcome': 'passed', 'duration': 610},
+        {'outcome': 'passed', 'duration': 600},
+        {'outcome': 'passed', 'duration': 605},
+    ]
+
+    estimate_time(builds)
+
+    assert builds[0]['elapsed'] == 'ten minutes left'
+
+
+def test_build_estimate_negative():
+    builds = [
+        {'started_at': int(datetime.now().timestamp()), 'outcome': 'working'},
+        {'outcome': 'passed', 'duration': -5},
+        {'outcome': 'passed', 'duration': -10},
+        {'outcome': 'passed', 'duration': 0},
+    ]
+
+    estimate_time(builds)
+
+    assert builds[0]['elapsed'] == 'nearly done'
+
+
+def test_build_estimate_not_first():
+    builds = [
+        {'started_at': None, 'outcome': None},
+        {'started_at': int(datetime.now().timestamp()), 'outcome': 'working'},
+        {'outcome': 'passed', 'duration': -5},
+        {'outcome': 'passed', 'duration': -10},
+        {'outcome': 'passed', 'duration': 0},
+    ]
+
+    estimate_time(builds)
+
+    assert builds[1]['elapsed'] == 'nearly done'
+
