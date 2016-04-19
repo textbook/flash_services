@@ -30,9 +30,10 @@ class GitHub(UrlParamMixin, Service):
     """
 
     AUTH_PARAM = 'access_token'
+    FRIENDLY_NAME = 'GitHub'
     REQUIRED = {'api_token', 'account', 'repo'}
     ROOT = 'https://api.github.com'
-    TEMPLATE = 'github'
+    TEMPLATE = 'vcs-section'
 
     def __init__(self, *, api_token, account, repo, branch=None, **kwargs):
         super().__init__(api_token=api_token, **kwargs)

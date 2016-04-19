@@ -19,7 +19,7 @@ def test_correct_config():
     assert Codeship.AUTH_PARAM == 'api_key'
     assert Codeship.REQUIRED == {'api_token', 'project_id'}
     assert Codeship.ROOT == 'https://codeship.com/api/v1'
-    assert Codeship.TEMPLATE == 'codeship'
+    assert Codeship.TEMPLATE == 'ci-section'
 
 
 @mock.patch('flash_services.codeship.logger.debug')

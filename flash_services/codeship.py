@@ -20,6 +20,7 @@ class Codeship(UrlParamMixin, Service):
     """
 
     AUTH_PARAM = 'api_key'
+    FRIENDLY_NAME = 'Codeship CI'
     OUTCOMES = {
         'cancelled': 'cancelled',
         'error': 'failed',
@@ -30,7 +31,7 @@ class Codeship(UrlParamMixin, Service):
     }
     REQUIRED = {'api_token', 'project_id'}
     ROOT = 'https://codeship.com/api/v1'
-    TEMPLATE = 'codeship'
+    TEMPLATE = 'ci-section'
 
     def __init__(self, *, api_token, project_id, **kwargs):
         super().__init__(api_token=api_token, **kwargs)

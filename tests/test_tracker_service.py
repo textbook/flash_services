@@ -16,7 +16,7 @@ def test_tracker_service_type():
 
 
 def test_correct_config():
-    assert Tracker.TEMPLATE == 'tracker'
+    assert Tracker.TEMPLATE == 'tracker-section'
     assert Tracker.REQUIRED == {'api_token', 'project_id'}
     assert Tracker.ROOT == 'https://www.pivotaltracker.com/services/v5'
 

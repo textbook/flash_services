@@ -23,7 +23,7 @@ def test_tracker_service_type():
 def test_correct_config():
     assert TravisOS.REQUIRED == {'app', 'account'}
     assert TravisOS.ROOT == 'https://api.travis-ci.org'
-    assert TravisOS.TEMPLATE == 'travis'
+    assert TravisOS.TEMPLATE == 'ci-section'
 
 
 def test_correct_headers(service):

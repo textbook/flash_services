@@ -12,18 +12,18 @@ from .tracker import Tracker
 from .travis import TravisOS
 
 __author__ = 'Jonathan Sharpe'
-__version__ = '0.1.5'
+__version__ = '0.2.0'
 
 blueprint = Blueprint('services', __name__, template_folder='templates')
 
 logger = logging.getLogger(__name__)
 
-SERVICES = dict(
-    codeship=Codeship,
-    github=GitHub,
-    tracker=Tracker,
-    travis=TravisOS,
-)
+SERVICES = {
+    'codeship': Codeship,
+    'github': GitHub,
+    'tracker': Tracker,
+    'travis': TravisOS,
+}
 """:py:class:`dict`: The services available to the application."""
 
 

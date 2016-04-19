@@ -21,7 +21,8 @@ Flash Services
   :target: https://github.com/textbook/flash_services/blob/master/LICENSE
   :alt: ISC License
 
-The services that can be shown on a `Flash`_ dashboard.
+The services that can be shown on a `Flash`_ dashboard. Includes the service
+update code and any custom templates not available in the core Flash package.
 
 Available services
 ==================

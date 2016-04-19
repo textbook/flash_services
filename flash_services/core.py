@@ -7,13 +7,16 @@ from urllib.parse import urlencode
 class Service(metaclass=ABCMeta):
     """Abstract base class for services."""
 
+    FRIENDLY_NAME = '<unnamed>'
+    """:py:class:`str`: The friendly name of the service."""
+
     REQUIRED = set()
     """:py:class:`set`: The service's required configuration keys."""
 
     ROOT = ''
     """:py:class:`str`: The root URL for the service API."""
 
-    TEMPLATE = 'undefined'
+    TEMPLATE = 'undefined-section'
     """:py:class:`str`: The name of the template to render."""
 
     @abstractmethod

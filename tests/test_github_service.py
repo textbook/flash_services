@@ -25,7 +25,7 @@ def test_correct_config():
     assert GitHub.AUTH_PARAM == 'access_token'
     assert GitHub.REQUIRED == {'api_token', 'account', 'repo'}
     assert GitHub.ROOT == 'https://api.github.com'
-    assert GitHub.TEMPLATE == 'github'
+    assert GitHub.TEMPLATE == 'vcs-section'
 
 
 TWO_DAYS_AGO = (datetime.now() - timedelta(days=2, hours=12)).strftime(

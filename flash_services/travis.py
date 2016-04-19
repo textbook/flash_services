@@ -23,6 +23,7 @@ class TravisOS(Service):
 
     """
 
+    FRIENDLY_NAME = 'Travis CI'
     OUTCOMES = {
         'canceled': 'cancelled',
         'created': 'working',
@@ -33,7 +34,7 @@ class TravisOS(Service):
     }
     REQUIRED = {'account', 'app'}
     ROOT = 'https://api.travis-ci.org'
-    TEMPLATE = 'travis'
+    TEMPLATE = 'ci-section'
 
     def __init__(self, *, account, app, **kwargs):
         super().__init__(**kwargs)
