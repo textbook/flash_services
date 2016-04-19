@@ -12,9 +12,14 @@ from .tracker import Tracker
 from .travis import TravisOS
 
 __author__ = 'Jonathan Sharpe'
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
-blueprint = Blueprint('services', __name__, template_folder='templates')
+blueprint = Blueprint(
+    'services',
+    __name__,
+    static_folder='static',
+    template_folder='templates',
+)
 
 logger = logging.getLogger(__name__)
 
