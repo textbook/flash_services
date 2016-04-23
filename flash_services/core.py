@@ -75,6 +75,7 @@ class Service(metaclass=ABCMeta):
 
 
 class ContinuousIntegrationService(Service):
+    """Service subclass for common CI behaviour."""
 
     OUTCOMES = dict()
     """:py:class:`dict`: Mapping from service to Flash outcomes."""
@@ -94,4 +95,19 @@ class ContinuousIntegrationService(Service):
             message=truncate(build.get('message', '&lt;no message&gt;')),
             outcome=cls.OUTCOMES.get(outcome),
             started_at=build.get('started_at'),
+        )
+
+
+class VersionControlService(Service):
+    """Service subclass for common (D)VCS behaviour."""
+
+    TEMPLATE = 'vcs-section'
+
+    @classmethod
+    @abstractmethod
+    def format_commit(cls, commit):
+        return dict(
+            author=commit.get('author', '&lt;no author&gt;'),
+            committed=commit.get('committed'),
+            message=truncate(commit.get('message', '')),
         )

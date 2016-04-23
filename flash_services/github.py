@@ -6,14 +6,14 @@ from collections import OrderedDict
 import requests
 
 from .auth import UrlParamMixin
-from .core import Service
-from .utils import occurred, truncate
+from .core import VersionControlService
+from .utils import occurred
 
 
 logger = logging.getLogger(__name__)
 
 
-class GitHub(UrlParamMixin, Service):
+class GitHub(UrlParamMixin, VersionControlService):
     """Show the current status of a GitHub repository.
 
     Arguments:
@@ -33,7 +33,6 @@ class GitHub(UrlParamMixin, Service):
     FRIENDLY_NAME = 'GitHub'
     REQUIRED = {'api_token', 'account', 'repo'}
     ROOT = 'https://api.github.com'
-    TEMPLATE = 'vcs-section'
 
     def __init__(self, *, api_token, account, repo, branch=None, **kwargs):
         super().__init__(api_token=api_token, **kwargs)
@@ -89,8 +88,8 @@ class GitHub(UrlParamMixin, Service):
             name=name,
         )
 
-    @staticmethod
-    def format_commit(commit):
+    @classmethod
+    def format_commit(cls, commit):
         """Re-format the commit data for the front-end.
 
         Arguments:
@@ -108,8 +107,8 @@ class GitHub(UrlParamMixin, Service):
             author_name = author
         else:
             author_name = '{} [{}]'.format(author, committer)
-        return dict(
+        return super().format_commit(dict(
             author=author_name,
             committed=occurred(commit.get('committer', {}).get('date')),
-            message=truncate(commit.get('message', '')),
-        )
+            message=commit.get('message', ''),
+        ))
