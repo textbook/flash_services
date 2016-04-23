@@ -1,7 +1,12 @@
 """Core service description."""
 
 from abc import ABCMeta, abstractmethod
+import logging
 from urllib.parse import urlencode
+
+from .utils import truncate
+
+logger = logging.getLogger(__name__)
 
 
 class Service(metaclass=ABCMeta):
@@ -67,3 +72,26 @@ class Service(metaclass=ABCMeta):
             ))
         instance = cls(**config)
         return instance
+
+
+class ContinuousIntegrationService(Service):
+
+    OUTCOMES = dict()
+    """:py:class:`dict`: Mapping from service to Flash outcomes."""
+
+    TEMPLATE = 'ci-section'
+
+    @classmethod
+    @abstractmethod
+    def format_build(cls, build):
+        outcome = build.get('outcome')
+        if outcome not in cls.OUTCOMES:
+            logger.warning('unknown outcome: %s', outcome)
+        return dict(
+            author=build.get('author', '&lt;no author&gt;'),
+            duration=build.get('duration'),
+            elapsed=build.get('elapsed'),
+            message=truncate(build.get('message', '&lt;no message&gt;')),
+            outcome=cls.OUTCOMES.get(outcome),
+            started_at=build.get('started_at'),
+        )

@@ -92,7 +92,7 @@ def test_formatting(service):
     )
 
 
-@mock.patch('flash_services.travis.logger.warning')
+@mock.patch('flash_services.core.logger.warning')
 def test_unfinished_formatting(warning, service):
     response = dict(
         builds=[dict(
@@ -120,4 +120,4 @@ def test_unfinished_formatting(warning, service):
         )],
         health='neutral',
     )
-    warning.assert_called_once_with('unknown status: %s', 'garbage')
+    warning.assert_called_once_with('unknown outcome: %s', 'garbage')

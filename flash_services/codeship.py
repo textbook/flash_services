@@ -4,13 +4,13 @@ import logging
 import requests
 
 from .auth import UrlParamMixin
-from .core import Service
-from .utils import elapsed_time, estimate_time, health_summary, truncate
+from .core import ContinuousIntegrationService
+from .utils import elapsed_time, estimate_time, health_summary
 
 logger = logging.getLogger(__name__)
 
 
-class Codeship(UrlParamMixin, Service):
+class Codeship(UrlParamMixin, ContinuousIntegrationService):
     """Show the current build status on Codeship.
 
     Arguments:
@@ -31,7 +31,6 @@ class Codeship(UrlParamMixin, Service):
     }
     REQUIRED = {'api_token', 'project_id'}
     ROOT = 'https://codeship.com/api/v1'
-    TEMPLATE = 'ci-section'
 
     def __init__(self, *, api_token, project_id, **kwargs):
         super().__init__(api_token=api_token, **kwargs)
@@ -78,20 +77,17 @@ class Codeship(UrlParamMixin, Service):
           :py:class:`dict`: The re-formatted data.
 
         """
-        status = build.get('status')
-        if status not in cls.OUTCOMES:
-            logger.warning('unknown status: %s', status)
         start, finish, elapsed = elapsed_time(
             build.get('started_at'),
             build.get('finished_at'),
         )
-        return dict(
+        return super().format_build(dict(
             author=build.get('github_username'),
             duration=(
                 None if start is None or finish is None else finish - start
             ),
             elapsed=elapsed,
-            message=truncate(build.get('message')),
-            outcome=cls.OUTCOMES.get(status),
+            message=build.get('message'),
+            outcome=build.get('status'),
             started_at=start,
-        )
+        ))

@@ -79,7 +79,7 @@ def test_formatting():
     )
 
 
-@mock.patch('flash_services.codeship.logger.warning')
+@mock.patch('flash_services.core.logger.warning')
 def test_unfinished_formatting(warning):
     response = dict(
         repository_name='foo',
@@ -106,4 +106,4 @@ def test_unfinished_formatting(warning):
         )],
         health='neutral',
     )
-    warning.assert_called_once_with('unknown status: %s', 'garbage')
+    warning.assert_called_once_with('unknown outcome: %s', 'garbage')

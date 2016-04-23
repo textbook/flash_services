@@ -4,13 +4,13 @@ import logging
 
 import requests
 
-from .core import Service
-from .utils import elapsed_time, estimate_time, health_summary, truncate
+from .core import ContinuousIntegrationService
+from .utils import elapsed_time, estimate_time, health_summary
 
 logger = logging.getLogger(__name__)
 
 
-class TravisOS(Service):
+class TravisOS(ContinuousIntegrationService):
     """Show the current status of an open-source project.
 
     Arguments:
@@ -34,7 +34,6 @@ class TravisOS(Service):
     }
     REQUIRED = {'account', 'app'}
     ROOT = 'https://api.travis-ci.org'
-    TEMPLATE = 'ci-section'
 
     def __init__(self, *, account, app, **kwargs):
         super().__init__(**kwargs)
@@ -88,7 +87,7 @@ class TravisOS(Service):
         )
 
     @classmethod
-    def format_build(cls, build, commit):
+    def format_build(cls, build, commit):  # pylint: disable=arguments-differ
         """Re-format the build and commit data for the front-end.
 
         Arguments:
@@ -99,20 +98,17 @@ class TravisOS(Service):
           :py:class:`dict`: The re-formatted data.
 
         """
-        status = build.get('state')
-        if status not in cls.OUTCOMES:
-            logger.warning('unknown status: %s', status)
         start, finish, elapsed = elapsed_time(
             build.get('started_at'),
             build.get('finished_at'),
         )
-        return dict(
+        return super().format_build(dict(
             author=commit.get('author_name'),
             duration=(
                 None if start is None or finish is None else finish - start
             ),
             elapsed=elapsed,
-            message=truncate(commit.get('message', '')),
-            outcome=cls.OUTCOMES.get(status),
+            message=commit.get('message'),
+            outcome=build.get('state'),
             started_at=start,
-        )
+        ))
