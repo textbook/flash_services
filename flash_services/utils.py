@@ -62,7 +62,8 @@ def truncate(text, max_len=20):
     """
     if len(text) <= max_len:
         return text
-    return '{}...'.format(text[:(max_len - 3)].strip())
+    result = text[:(max_len - 3)].strip()
+    return result if result.endswith('...') else '{}...'.format(result)
 
 
 def elapsed_time(start, end):

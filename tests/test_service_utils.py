@@ -13,6 +13,7 @@ TWO_DAYS_AGO = datetime.now() - timedelta(days=2, hours=12)
     (('hello world',), 'hello world'),
     (('hello world', 10), 'hello w...'),
     (('hello world', 9), 'hello...'),
+    (('Unfocus tests...\n\nSigned-off-by: Jonathan Sharpe <jsharpe@pivotal.io>',), 'Unfocus tests...'),
 ])
 def test_truncate(input_, expected):
     assert truncate(*input_) == expected
