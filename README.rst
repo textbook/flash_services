@@ -49,14 +49,30 @@ The following service definitions include the configuration options:
   * ``api_token`` (required)
   * ``project_id`` (required)
 
-* ``travis`` - for CI builds on `Travis CI`_ (currently only supports open-
-  source builds on the ``.org`` site).
+* ``travis`` - for CI builds on `Travis CI`_ (currently only supports
+  open-source builds on the ``.org`` site).
 
   * ``account`` (required)
   * ``app`` (required)
 
+Writing a service
+=================
+
+The idea behind this package is to make it easier to add new service providers
+to Flash. Each new service should subclass ``Service`` (or one of its more
+specific children, where appropriate) from the ``core.py`` file. The mix-in
+classes in ``auth.py`` can be used to implement authentication to the service
+API endpoint as needed (currently both header and query parameter token
+validation are supported).
+
+Any service-specific partial templates (using the `Jinja2`_ templating language)
+should be placed in ``templates/partials`` and service-specific client-side
+behaviour should live in a new function in the ``SERVICES`` object in
+``static/scripts/services.js``, keyed by the ``FRIENDLY_NAME`` of the service.
+
 .. _Codeship: https://codeship.com/
 .. _Flash: https://github.com/textbook/flash
 .. _GitHub: https://github.com/
+.. _Jinja2: http://jinja.pocoo.org/
 .. _Pivotal Tracker: https://www.pivotaltracker.com/
 .. _Travis CI: https://travis-ci.org/
