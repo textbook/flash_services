@@ -1,6 +1,10 @@
 Flash Services
 --------------
 
+.. image:: https://img.shields.io/pypi/v/flash_services.svg
+    :target: https://pypi.python.org/pypi/flash_services
+    :alt: PyPI Version
+
 .. image:: https://travis-ci.org/textbook/flash_services.svg?branch=master
   :target: https://travis-ci.org/textbook/flash_services
   :alt: Travis Build Status
@@ -23,6 +27,11 @@ Flash Services
 
 The services that can be shown on a `Flash`_ dashboard. Includes the service
 update code and any custom templates not available in the core Flash package.
+
+Documentation
+=============
+
+Documentation is available on PythonHosted_.
 
 Available services
 ==================
@@ -75,4 +84,5 @@ behaviour should live in a new function in the ``SERVICES`` object in
 .. _GitHub: https://github.com/
 .. _Jinja2: http://jinja.pocoo.org/
 .. _Pivotal Tracker: https://www.pivotaltracker.com/
+.. _PythonHosted: https://pythonhosted.org/flash_services
 .. _Travis CI: https://travis-ci.org/
