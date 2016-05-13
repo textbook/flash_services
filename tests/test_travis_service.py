@@ -114,7 +114,7 @@ def test_unfinished_formatting(warning, service):
             author='alice',
             duration=None,
             elapsed='elapsed time not available',
-            message='some much longer...',
+            message='some much longer message',
             outcome=None,
             started_at=None,
         )],

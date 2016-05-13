@@ -100,7 +100,7 @@ def test_unfinished_formatting(warning):
             author='textbook',
             duration=None,
             elapsed='elapsed time not available',
-            message='some much longer...',
+            message='some much longer message',
             outcome=None,
             started_at=1459551843,
         )],

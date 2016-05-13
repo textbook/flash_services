@@ -4,8 +4,6 @@ from abc import ABCMeta, abstractmethod
 import logging
 from urllib.parse import urlencode
 
-from .utils import truncate
-
 logger = logging.getLogger(__name__)
 
 
@@ -92,7 +90,7 @@ class ContinuousIntegrationService(Service):
             author=build.get('author', '&lt;no author&gt;'),
             duration=build.get('duration'),
             elapsed=build.get('elapsed'),
-            message=truncate(build.get('message', '&lt;no message&gt;')),
+            message=build.get('message', '&lt;no message&gt;'),
             outcome=cls.OUTCOMES.get(outcome),
             started_at=build.get('started_at'),
         )
@@ -109,5 +107,5 @@ class VersionControlService(Service):
         return dict(
             author=commit.get('author', '&lt;no author&gt;'),
             committed=commit.get('committed'),
-            message=truncate(commit.get('message', '')),
+            message=commit.get('message', ''),
         )

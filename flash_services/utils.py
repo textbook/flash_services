@@ -51,21 +51,6 @@ naturaldelta = friendlier(naturaldelta)
 naturaltime = friendlier(naturaltime)
 
 
-def truncate(text, max_len=20):
-    """Truncate the supplied text.
-
-    Arguments:
-      text (:py:class:`str`): The text to truncate.
-      max_len (:py:class:`int`, optional): The maximum text length to
-        return (defaults to ``20``).
-
-    """
-    if len(text) <= max_len:
-        return text
-    result = text[:(max_len - 3)].strip()
-    return result if result.endswith('...') else '{}...'.format(result)
-
-
 def elapsed_time(start, end):
     """Calculate the elapsed time for a service activity.
 

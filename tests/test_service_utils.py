@@ -4,19 +4,9 @@ from unittest import mock
 import pytest
 
 from flash_services.utils import (elapsed_time, estimate_time, friendlier,
-                                  health_summary, occurred, truncate)
+                                  health_summary, occurred)
 
 TWO_DAYS_AGO = datetime.now() - timedelta(days=2, hours=12)
-
-
-@pytest.mark.parametrize('input_, expected', [
-    (('hello world',), 'hello world'),
-    (('hello world', 10), 'hello w...'),
-    (('hello world', 9), 'hello...'),
-    (('Unfocus tests...\n\nSigned-off-by: Jonathan Sharpe <jsharpe@pivotal.io>',), 'Unfocus tests...'),
-])
-def test_truncate(input_, expected):
-    assert truncate(*input_) == expected
 
 
 @pytest.mark.parametrize('input_, expected, logged', [
