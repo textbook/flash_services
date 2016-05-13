@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from datetime import datetime, timezone, timedelta
 
 import pytest
 
@@ -47,3 +48,15 @@ def test_required_config(config):
 ])
 def test_url_builder(args, kwargs, expected):
     assert Test().url_builder(*args, **kwargs) == expected
+
+
+def test_calculate_timeout_delta_seconds():
+    assert Service.calculate_timeout('120') == 120
+
+
+def test_calculate_timeout_http_date():
+    three_minutes_later = datetime.now(tz=timezone.utc) + timedelta(minutes=3)
+    http_date = '%a, %d %b %Y %H:%M:%S %Z'
+    assert 179 <= Service.calculate_timeout(
+        three_minutes_later.strftime(http_date),
+    ) <= 181

@@ -7,19 +7,19 @@ from collections import OrderedDict
 class TokenAuthMixin:
     """Mix-in class for implementing token authentication."""
 
+    TOKEN_ENV_VAR = None
+    """:py:class:`str`: The environment variable holding the token."""
+
     def __init__(self, *, api_token, **kwargs):
         self.api_token = api_token
         super().__init__(**kwargs)
 
 
 class UrlParamMixin(TokenAuthMixin):
-    """Mix-in class for implementing URL parameter authentication.
+    """Mix-in class for implementing URL parameter authentication."""
 
-    Attributes:
-      AUTH_PARAM (:py:class:`str`): The name of the URL parameter to
-        supply the token as.
-
-    """
+    AUTH_PARAM = None
+    """:py:class:`str`: The name of the URL parameter."""
 
     def url_builder(self, endpoint, params=None, url_params=None):
         """Add authentication URL parameter."""
@@ -34,13 +34,10 @@ class UrlParamMixin(TokenAuthMixin):
 
 
 class HeaderMixin(TokenAuthMixin):
-    """Mix-in class for implementing header authentication.
+    """Mix-in class for implementing header authentication."""
 
-    Attributes:
-      AUTH_HEADER: (:py:class:`str`) The name of the request header to
-        supply the token as.
-
-    """
+    AUTH_HEADER = None
+    """:py:class:`str`: The name of the request header."""
 
     @property
     def headers(self):

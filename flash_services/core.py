@@ -2,7 +2,11 @@
 
 from abc import ABCMeta, abstractmethod
 import logging
+from datetime import datetime
+from datetime import timezone
 from urllib.parse import urlencode
+
+from dateutil.parser import parse
 
 logger = logging.getLogger(__name__)
 
@@ -70,6 +74,29 @@ class Service(metaclass=ABCMeta):
             ))
         instance = cls(**config)
         return instance
+
+    @staticmethod
+    def calculate_timeout(http_date):
+        """Extract request timeout from e.g. ``Retry-After`` header.
+
+        Notes:
+          Per :rfc:`2616#section-14.37`, the ``Retry-After`` header can
+          be either an integer number of seconds or an HTTP date. This
+          function can handle either.
+
+        Arguments:
+          http_date (:py:class:`str`): The date to parse.
+
+        Returns:
+          :py:class:`int`: The timeout, in seconds.
+
+        """
+        try:
+            return int(http_date)
+        except ValueError:
+            date_after = parse(http_date)
+        utc_now = datetime.now(tz=timezone.utc)
+        return int((date_after - utc_now).total_seconds())
 
 
 class ContinuousIntegrationService(Service):
