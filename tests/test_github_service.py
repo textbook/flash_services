@@ -87,7 +87,7 @@ def test_update_failure(get, error, service):
         ),
     ),
     (
-        dict(author=dict(name='alice'), message='hello world'),
+        dict(author=dict(name='alice'), message='hello world fixes foo/bar#3'),
         dict(
             author='alice',
             committed='time not available',

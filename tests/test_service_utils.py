@@ -4,7 +4,7 @@ from unittest import mock
 import pytest
 
 from flash_services.utils import (elapsed_time, estimate_time, friendlier,
-                                  health_summary, occurred)
+                                  health_summary, occurred, remove_tags)
 
 TWO_DAYS_AGO = datetime.now() - timedelta(days=2, hours=12)
 
@@ -125,3 +125,13 @@ def test_build_estimate_not_first():
 
     assert builds[1]['elapsed'] == 'nearly done'
 
+
+@pytest.mark.parametrize('message, expected', [
+    ('[#123456789] hello world', 'hello world'),
+    ('[#123456789 #234567] hello world', 'hello world'),
+    ('[#123456789 fixed #234567] hello world', 'hello world'),
+    ('[FINISHES #123456789] hello world', 'hello world'),
+    ('hello world Fixes foo/bar#123', 'hello world'),
+])
+def test_remove_tags(message, expected):
+    assert remove_tags(message) == expected

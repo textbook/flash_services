@@ -189,3 +189,53 @@ def estimate_time(builds):
         current['elapsed'] = '{} left'.format(naturaldelta(remaining))
     else:
         current['elapsed'] = 'nearly done'
+
+
+GITHUB_ISSUE = re.compile(r'''
+    (?:                     # one of:
+        fix(?:e(?:s|d))?    # fix, fixes or fixed
+        | close(?:s|d)?     # close, closes or closed
+        | resolve(?:s|d)?   # resolve, resolves or resolved
+    )\s*(?:[^/]+/[^#]+)?    # the account and repository name
+    \#\d+                   # the issue number
+''', re.IGNORECASE + re.VERBOSE)
+"""Pattern for commit comment issue ID format, per `GitHub documentation`_.
+
+.. _GitHub documentation: https://help.github.com/articles/closing-issues-via-commit-messages/
+
+"""
+
+TRACKER_STORY = re.compile(r'''
+    \[(?:
+        (?:
+            finish(?:e(?:s|d))? # finish, finishes or finished
+            | complete(?:s|d)?  # complete, completes or completed
+            | fix(?:e(?:s|d))?  # fix, fixes or fixed
+        )?
+        \s*\#\d+\s*             # the story ID
+    )+\]
+''', re.IGNORECASE + re.VERBOSE)
+"""Pattern for commit hook story ID format, per `Tracker documentation`_.
+
+.. _Tracker documentation: https://www.pivotaltracker.com/help/api?version=v3#scm_post_commit
+
+"""
+
+
+def remove_tags(commit_message):
+    """Remove issue/tracker tags from a commit message.
+
+    Notes:
+      Currently implemented for :py:class:`~.Tracker` and
+      :py:class:`~.GitHub` commit messages.
+
+    Arguments:
+      commit_message (:py:class:`str`): The commit message.
+
+    Returns:
+      :py:class:`str`: The message with tags removed.
+
+    """
+    for remove in [GITHUB_ISSUE, TRACKER_STORY]:
+        commit_message = remove.sub('', commit_message)
+    return commit_message.strip()

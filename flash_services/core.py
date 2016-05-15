@@ -8,6 +8,8 @@ from urllib.parse import urlencode
 
 from dateutil.parser import parse
 
+from .utils import remove_tags
+
 logger = logging.getLogger(__name__)
 
 
@@ -134,5 +136,5 @@ class VersionControlService(Service):
         return dict(
             author=commit.get('author', '&lt;no author&gt;'),
             committed=commit.get('committed'),
-            message=commit.get('message', ''),
+            message=remove_tags(commit.get('message', '')),
         )
