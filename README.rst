@@ -38,6 +38,25 @@ Available services
 
 The following service definitions include the configuration options:
 
+* ``codeship`` - for CI builds on `Codeship`_
+
+  * ``api_token`` (required)
+  * ``project_id`` (required)
+
+* ``coveralls`` - for coverage reporting on `Coveralls`_ (currently only
+  supports open-source builds)
+
+  * ``ci_service`` (required - the name of the service the project is accessed
+    via, e.g. ``'github'``)
+  * ``account`` (required - the name of the account the project is in, e.g.
+    ``"textbook"``)
+  * ``repo`` (required - the name of the project repository within that account,
+    e.g. ``"flash"``)
+  * ``ok_threshold`` (the minimum coverage level to show as an OK state,
+    defaults to 80%)
+  * ``neutral_threshold`` (the minimum coverage level to show as a neutral
+    state, defaults to 50%)
+
 * ``github`` - for project repositories on `GitHub`_
 
   * ``api_token`` (required),
@@ -47,11 +66,6 @@ The following service definitions include the configuration options:
     e.g. ``"flash"``)
   * ``branch`` (the name of the branch to show commits from, defaulting to the
     repository's default branch, which is usually ``master``).
-
-* ``codeship`` - for CI builds on `Codeship`_
-
-  * ``api_token`` (required)
-  * ``project_id`` (required)
 
 * ``tracker`` - for projects on `Pivotal Tracker`_
 
@@ -80,6 +94,7 @@ behaviour should live in a new function in the ``SERVICES`` object in
 ``static/scripts/services.js``, keyed by the ``FRIENDLY_NAME`` of the service.
 
 .. _Codeship: https://codeship.com/
+.. _Coveralls: https://coveralls.io/
 .. _Flash: https://github.com/textbook/flash
 .. _GitHub: https://github.com/
 .. _Jinja2: http://jinja.pocoo.org/

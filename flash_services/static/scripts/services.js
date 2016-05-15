@@ -6,6 +6,15 @@ var SERVICES = {
       updateItems(pane, data.builds, '.build-outcome', updateOutcome);
     }
   },
+  coveralls: function (pane, data) {
+    if (data.builds) {
+      updateItems(pane, data.builds, '.coverage', function (element, data) {
+        ['author', 'committed', 'coverage', 'message_text'].forEach(function (attr) {
+          element.find('.' + attr).text(data[attr]);
+        });
+      });
+    }
+  },
   github: function (pane, data) {
     if (data.commits) {
       updateItems(pane, data.commits, '.commit', updateCommit);

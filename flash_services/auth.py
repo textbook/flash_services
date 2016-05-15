@@ -4,6 +4,10 @@
 from collections import OrderedDict
 
 
+class Unauthenticated:
+    """No-op mix-in class for unauthenticated services."""
+
+
 class TokenAuthMixin:
     """Mix-in class for implementing token authentication."""
 
