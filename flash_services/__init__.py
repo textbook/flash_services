@@ -10,10 +10,10 @@ from .codeship import Codeship
 from .coveralls import Coveralls
 from .github import GitHub
 from .tracker import Tracker
-from .travis import TravisOS
+from .travis import TravisOS, TravisPro
 
 __author__ = 'Jonathan Sharpe'
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 
 blueprint = Blueprint(
     'services',
@@ -30,6 +30,7 @@ SERVICES = dict(
     github=GitHub,
     tracker=Tracker,
     travis=TravisOS,
+    travis_pro=TravisPro,
 )
 """:py:class:`dict`: The services available to the application."""
 

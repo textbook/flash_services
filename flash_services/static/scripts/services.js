@@ -37,5 +37,10 @@ var SERVICES = {
     if (data.builds) {
       updateItems(pane, data.builds, '.build-outcome', updateOutcome);
     }
+  },
+  travis_pro: function (pane, data) {
+    if (data.builds) {
+      updateItems(pane, data.builds, '.build-outcome', updateOutcome);
+    }
   }
 };

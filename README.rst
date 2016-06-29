@@ -72,10 +72,15 @@ The following service definitions include the configuration options:
   * ``api_token`` (required)
   * ``project_id`` (required)
 
-* ``travis`` - for CI builds on `Travis CI`_ (currently only supports
-  open-source builds on the ``.org`` site).
+* ``travis`` - for public CI builds on `Travis CI (.org)`_.
 
   * ``account`` (required)
+  * ``app`` (required)
+
+* ``travis_pro`` - for private CI builds on `Travis CI (.com)`_
+
+  * ``account`` (required)
+  * ``api_token`` (required - see `Travis API docs`_ for details)
   * ``app`` (required)
 
 Writing a service
@@ -100,4 +105,6 @@ behaviour should live in a new function in the ``SERVICES`` object in
 .. _Jinja2: http://jinja.pocoo.org/
 .. _Pivotal Tracker: https://www.pivotaltracker.com/
 .. _PythonHosted: https://pythonhosted.org/flash_services
-.. _Travis CI: https://travis-ci.org/
+.. _Travis API docs: https://docs.travis-ci.com/api?shell#authentication
+.. _Travis CI (.org): https://travis-ci.org/
+.. _Travis CI (.com): https://travis-ci.com/

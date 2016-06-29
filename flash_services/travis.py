@@ -4,6 +4,7 @@ import logging
 
 import requests
 
+from .auth import HeaderMixin
 from .core import ContinuousIntegrationService
 from .utils import elapsed_time, estimate_time, health_summary
 
@@ -30,7 +31,7 @@ class TravisOS(ContinuousIntegrationService):
         'failed': 'failed',
         'passed': 'passed',
         'started': 'working',
-        '?': 'crashed',
+        'errored': 'crashed',
     }
     REQUIRED = {'account', 'app'}
     ROOT = 'https://api.travis-ci.org'
@@ -112,3 +113,21 @@ class TravisOS(ContinuousIntegrationService):
             outcome=build.get('state'),
             started_at=start,
         ))
+
+class TravisPro(HeaderMixin, TravisOS):
+    """Show the current status of a pro (travis-ci.com) project.
+
+    Arguments:
+      account (:py:class:`str`): The name of the account.
+      api_token(:py:class:`str`): The API token.
+      app (:py:class:`str`): The name of the application.
+
+    Attributes:
+      repo (:py:class:`str`): The repository name, in the format
+        ``account/application``.
+
+    """
+
+    AUTH_HEADER = 'Authorization'
+    REQUIRED = TravisOS.REQUIRED.union({'api_token'})
+    ROOT = TravisOS.ROOT.replace('.org', '.com')
