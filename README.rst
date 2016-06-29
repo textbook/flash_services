@@ -46,7 +46,7 @@ The following service definitions include the configuration options:
 * ``coveralls`` - for coverage reporting on `Coveralls`_ (currently only
   supports open-source builds)
 
-  * ``ci_service`` (required - the name of the service the project is accessed
+  * ``vcs_name`` (required - the name of the service the project is accessed
     via, e.g. ``'github'``)
   * ``account`` (required - the name of the account the project is in, e.g.
     ``"textbook"``)
