@@ -86,7 +86,7 @@ def to_utc_timestamp(date_time):
     """
     if date_time is None:
         return
-    if date_time.tzname is None:
+    if date_time.tzname() is None:
         timestamp = date_time.replace(tzinfo=timezone.utc).timestamp()
     else:
         timestamp = date_time.timestamp()
