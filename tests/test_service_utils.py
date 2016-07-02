@@ -14,13 +14,13 @@ TWO_DAYS_AGO = datetime.now() - timedelta(days=2, hours=12)
     ((TWO_DAYS_AGO.strftime('%Y-%m-%dT%H:%M:%SZ'),), 'two days ago', False),
     ((TWO_DAYS_AGO.strftime('%Y-%m-%dT%H:%M:%S'),), 'two days ago', False),
 ])
-@mock.patch('flash_services.utils.logger.exception')
-def test_occurred(exception, input_, expected, logged):
+@mock.patch('flash_services.utils.logger.warning')
+def test_occurred(logger, input_, expected, logged):
     assert occurred(*input_) == expected
     if logged:
-        exception.assert_called_once_with('failed to parse occurrence time')
+        logger.assert_called_once_with('failed to parse occurrence time %r', None)
     else:
-        exception.assert_not_called()
+        logger.assert_not_called()
 
 
 @pytest.mark.parametrize('input_, expected, logged', [
@@ -41,13 +41,13 @@ def test_occurred(exception, input_, expected, logged):
         False,
     ),
 ])
-@mock.patch('flash_services.utils.logger.exception')
-def test_elapsed_time(exception, input_, expected, logged):
+@mock.patch('flash_services.utils.logger.warning')
+def test_elapsed_time(logger, input_, expected, logged):
     assert elapsed_time(*input_) == expected
     if logged:
-        exception.assert_called_once_with('failed to generate elapsed time')
+        logger.assert_called_once_with('failed to generate elapsed time')
     else:
-        exception.assert_not_called()
+        logger.assert_not_called()
 
 
 @pytest.mark.parametrize('text, expected', [

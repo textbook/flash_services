@@ -66,7 +66,7 @@ def elapsed_time(start, end):
     start_time = safe_parse(start)
     end_time = safe_parse(end)
     if start_time is None or end_time is None:
-        logger.exception('failed to generate elapsed time')
+        logger.warning('failed to generate elapsed time')
         text = 'elapsed time not available'
     else:
         text = 'took {}'.format(naturaldelta(parse(end) - parse(start)))
@@ -124,7 +124,7 @@ def occurred(at_):
     try:
         occurred_at = parse(at_)
     except (AttributeError, ValueError):
-        logger.exception('failed to parse occurrence time')
+        logger.warning('failed to parse occurrence time %r', at_)
         return 'time not available'
     utc_now = datetime.now(tz=timezone.utc)
     try:
