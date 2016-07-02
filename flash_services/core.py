@@ -3,7 +3,7 @@
 from abc import ABCMeta, abstractmethod
 from datetime import datetime
 from datetime import timezone
-from html import escape
+from html import escape, unescape
 import logging
 from urllib.parse import urlencode
 
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class Service(metaclass=ABCMeta):
     """Abstract base class for services."""
 
-    FRIENDLY_NAME = '<unnamed>'
+    FRIENDLY_NAME = escape('<unnamed>')
     """:py:class:`str`: The friendly name of the service."""
 
     REQUIRED = set()
@@ -72,8 +72,10 @@ class Service(metaclass=ABCMeta):
         """Manipulate the configuration settings."""
         missing = cls.REQUIRED.difference(config)
         if missing:
-            raise TypeError('missing required config keys: {!s}'.format(
-                ', '.join(missing)
+            message = 'missing required config keys ({}) from {}'
+            raise TypeError(message.format(
+                ', '.join(missing),
+                unescape(cls.FRIENDLY_NAME),
             ))
         instance = cls(**config)
         return instance
