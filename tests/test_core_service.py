@@ -19,9 +19,9 @@ class Test(Service):
 
 
 @pytest.mark.parametrize('config', [
-    ({},),
-    ({'foo': None},),
-    ({'bar': None},),
+    {},
+    {'foo': None},
+    {'bar': None},
 ])
 def test_required_config(config):
     with pytest.raises(TypeError):
