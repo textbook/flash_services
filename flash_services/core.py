@@ -1,9 +1,10 @@
 """Core service description."""
 
 from abc import ABCMeta, abstractmethod
-import logging
 from datetime import datetime
 from datetime import timezone
+from html import escape
+import logging
 from urllib.parse import urlencode
 
 from dateutil.parser import parse
@@ -116,10 +117,10 @@ class ContinuousIntegrationService(Service):
         if outcome not in cls.OUTCOMES:
             logger.warning('unknown outcome: %s', outcome)
         return dict(
-            author=build.get('author', '&lt;no author&gt;'),
+            author=build.get('author', escape('<no author>')),
             duration=build.get('duration'),
             elapsed=build.get('elapsed'),
-            message=build.get('message', '&lt;no message&gt;'),
+            message=build.get('message', escape('<no message>')),
             outcome=cls.OUTCOMES.get(outcome),
             started_at=build.get('started_at'),
         )
@@ -134,7 +135,7 @@ class VersionControlService(Service):
     @abstractmethod
     def format_commit(cls, commit):
         return dict(
-            author=commit.get('author', '&lt;no author&gt;'),
+            author=commit.get('author', escape('<no author>')),
             committed=commit.get('committed'),
             message=remove_tags(commit.get('message', '')),
         )
