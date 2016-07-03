@@ -1,7 +1,7 @@
 """Defines the GitHub service integration."""
 
 import logging
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
 
 import requests
 
@@ -112,3 +112,39 @@ class GitHub(UrlParamMixin, VersionControlService):
             committed=occurred(commit.get('committer', {}).get('date')),
             message=commit.get('message', ''),
         ))
+
+
+class GitHubIssues(GitHub):
+    """Show the current status of GitHub issues and pull requests."""
+
+    FRIENDLY_NAME = 'GitHub Issues'
+    TEMPLATE = 'gh-issues-section'
+
+    def update(self):
+        logger.debug('fetching GitHub issue data')
+        url_params = OrderedDict(state='all')
+        response = requests.get(
+            self.url_builder(
+                '/repos/{repo}/issues',
+                params={'repo': self.repo_name},
+                url_params=url_params,
+            ),
+            headers=self.headers,
+        )
+        if response.status_code == 200:
+            return self.format_data(self.name, response.json())
+        logger.error('failed to update GitHub issue data')
+        return {}
+
+    @classmethod
+    def format_data(cls, name, data):
+        counts = defaultdict(int)
+        for issue in data:
+            if issue.get('pull_request') is not None:
+                counts['{}-pull-requests'.format(issue['state'])] += 1
+            else:
+                counts['{}-issues'.format(issue['state'])] += 1
+        return dict(
+            issues=counts,
+            name=name,
+        )

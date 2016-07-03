@@ -15,6 +15,15 @@ var SERVICES = {
       });
     }
   },
+  gh_issues: function (pane, data) {
+    if (data.issues) {
+      var states = ['open-issues', 'closed-issues', 'open-pull-requests',
+                    'closed-pull-requests'];
+      states.forEach(function (state) {
+        pane.find('.' + state).text(data.issues[state] || 0);
+      });
+    }
+  },
   github: function (pane, data) {
     if (data.commits) {
       updateItems(pane, data.commits, '.commit', updateCommit);

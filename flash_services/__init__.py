@@ -8,12 +8,12 @@ from flask import Blueprint
 
 from .codeship import Codeship
 from .coveralls import Coveralls
-from .github import GitHub
+from .github import GitHub, GitHubIssues
 from .tracker import Tracker
 from .travis import TravisOS, TravisPro
 
 __author__ = 'Jonathan Sharpe'
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 
 blueprint = Blueprint(
     'services',
@@ -28,6 +28,7 @@ SERVICES = dict(
     codeship=Codeship,
     coveralls=Coveralls,
     github=GitHub,
+    gh_issues=GitHubIssues,
     tracker=Tracker,
     travis=TravisOS,
     travis_pro=TravisPro,
