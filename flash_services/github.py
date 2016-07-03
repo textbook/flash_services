@@ -120,6 +120,11 @@ class GitHubIssues(GitHub):
     FRIENDLY_NAME = 'GitHub Issues'
     TEMPLATE = 'gh-issues-section'
 
+    def __init__(self, *, api_token, account, repo, **kwargs):
+        super().__init__(account=account, api_token=api_token, repo=repo,
+                         **kwargs)
+        self.branch = None  # branches aren't relevant for issues
+
     def update(self):
         logger.debug('fetching GitHub issue data')
         url_params = OrderedDict(state='all')
