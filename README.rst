@@ -57,6 +57,14 @@ The following service definitions include the configuration options:
   * ``neutral_threshold`` (the minimum coverage level to show as a neutral
     state, defaults to 50%)
 
+* ``gh_issues`` - for issues and PRs in project repositories on `GitHub`_
+
+  * ``api_token`` (required),
+  * ``account`` (required - the name of the account the project is in, e.g.
+    ``"textbook"``)
+  * ``repo`` (required - the name of the project repository within that account,
+    e.g. ``"flash"``)
+
 * ``github`` - for project repositories on `GitHub`_
 
   * ``api_token`` (required),
