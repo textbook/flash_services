@@ -62,6 +62,14 @@ The following service definitions include the configuration options:
   * ``api_token`` (required),
   * ``account`` (required - the name of the account the project is in, e.g.
     ``"textbook"``)
+  * ``repo`` (required
+
+* ``ghe_issues`` - for issues and PRs in project repositories on
+  `GitHub Enterprise`_ installations
+
+  * ``api_token`` (required),
+  * ``account`` (required - the name of the account the project is in, e.g.
+    ``"textbook"``)
   * ``repo`` (required - the name of the project repository within that account,
     e.g. ``"flash"``)
 
@@ -73,7 +81,18 @@ The following service definitions include the configuration options:
   * ``repo`` (required - the name of the project repository within that account,
     e.g. ``"flash"``)
   * ``branch`` (the name of the branch to show commits from, defaulting to the
-    repository's default branch, which is usually ``master``).
+    repository's default branch, which is usually ``master``)
+
+* ``github_enterprise`` - for project repositories on `GitHub Enterprise`_
+  installations
+
+  * ``api_token`` (required),
+  * ``account`` (required - the name of the account the project is in, e.g.
+    ``"textbook"``)
+  * ``repo`` (required - the name of the project repository within that account,
+    e.g. ``"flash"``)
+  * ``branch`` (the name of the branch to show commits from, defaulting to the
+    repository's default branch, which is usually ``master``)
 
 * ``tracker`` - for projects on `Pivotal Tracker`_
 
@@ -110,6 +129,7 @@ behaviour should live in a new function in the ``SERVICES`` object in
 .. _Coveralls: https://coveralls.io/
 .. _Flash: https://github.com/textbook/flash
 .. _GitHub: https://github.com/
+.. _GitHub Enterprise: https://enterprise.github.com/home
 .. _Jinja2: http://jinja.pocoo.org/
 .. _Pivotal Tracker: https://www.pivotaltracker.com/
 .. _PythonHosted: https://pythonhosted.org/flash_services

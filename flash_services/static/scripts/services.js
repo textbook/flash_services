@@ -1,11 +1,29 @@
 /* globals updateCommit,updateItems,updateOutcome */
 
+function builds(pane, data) {
+  if (data.builds) {
+    updateItems(pane, data.builds, '.build-outcome', updateOutcome);
+  }
+}
+
+function gh_issues(pane, data) {
+  if (data.issues) {
+    var states = ['open-issues', 'closed-issues', 'open-pull-requests',
+                  'closed-pull-requests'];
+    states.forEach(function (state) {
+      pane.find('.' + state).text(data.issues[state] || 0);
+    });
+  }
+}
+
+function github(pane, data) {
+  if (data.commits) {
+    updateItems(pane, data.commits, '.commit', updateCommit);
+  }
+}
+
 var SERVICES = {
-  codeship: function (pane, data) {
-    if (data.builds) {
-      updateItems(pane, data.builds, '.build-outcome', updateOutcome);
-    }
-  },
+  codeship: builds,
   coveralls: function (pane, data) {
     if (data.builds) {
       updateItems(pane, data.builds, '.coverage', function (element, data) {
@@ -15,20 +33,10 @@ var SERVICES = {
       });
     }
   },
-  gh_issues: function (pane, data) {
-    if (data.issues) {
-      var states = ['open-issues', 'closed-issues', 'open-pull-requests',
-                    'closed-pull-requests'];
-      states.forEach(function (state) {
-        pane.find('.' + state).text(data.issues[state] || 0);
-      });
-    }
-  },
-  github: function (pane, data) {
-    if (data.commits) {
-      updateItems(pane, data.commits, '.commit', updateCommit);
-    }
-  },
+  gh_issues: gh_issues,
+  ghe_issues: gh_issues,
+  github: github,
+  github_enterprise: github,
   tracker: function (pane, data) {
     if (data.velocity) { pane.find('.velocity').text(data.velocity); }
     if (data.stories) {
@@ -42,14 +50,6 @@ var SERVICES = {
       );
     }
   },
-  travis: function (pane, data) {
-    if (data.builds) {
-      updateItems(pane, data.builds, '.build-outcome', updateOutcome);
-    }
-  },
-  travis_pro: function (pane, data) {
-    if (data.builds) {
-      updateItems(pane, data.builds, '.build-outcome', updateOutcome);
-    }
-  }
+  travis: builds,
+  travis_pro: builds
 };

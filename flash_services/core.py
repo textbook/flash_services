@@ -141,3 +141,20 @@ class VersionControlService(Service):
             committed=commit.get('committed'),
             message=remove_tags(commit.get('message', '')),
         )
+
+
+class CustomRootMixin:
+    """Mix-in class for implementing custom service roots."""
+
+    REQUIRED = {'root'}
+    ROOT = ''
+
+    def __init__(self, *, root, **kwargs):
+        super().__init__(**kwargs)
+        self.root = root
+
+    def url_builder(self, endpoint, *, root=None, params=None, url_params=None):
+        if root is None:
+            root = self.root
+        return super().url_builder(endpoint=endpoint, root=root, params=params,
+                                   url_params=url_params)

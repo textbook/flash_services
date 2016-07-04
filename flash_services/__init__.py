@@ -8,7 +8,8 @@ from flask import Blueprint
 
 from .codeship import Codeship
 from .coveralls import Coveralls
-from .github import GitHub, GitHubIssues
+from .github import (GitHub, GitHubEnterprise, GitHubEnterpriseIssues,
+                     GitHubIssues)
 from .tracker import Tracker
 from .travis import TravisOS, TravisPro
 
@@ -28,7 +29,9 @@ SERVICES = dict(
     codeship=Codeship,
     coveralls=Coveralls,
     github=GitHub,
+    github_enterprise=GitHubEnterprise,
     gh_issues=GitHubIssues,
+    ghe_issues=GitHubEnterpriseIssues,
     tracker=Tracker,
     travis=TravisOS,
     travis_pro=TravisPro,

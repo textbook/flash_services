@@ -6,7 +6,7 @@ from collections import defaultdict, OrderedDict
 import requests
 
 from .auth import UrlParamMixin
-from .core import VersionControlService
+from .core import CustomRootMixin, VersionControlService
 from .utils import occurred
 
 
@@ -153,3 +153,15 @@ class GitHubIssues(GitHub):
             issues=counts,
             name=name,
         )
+
+
+class GitHubEnterprise(CustomRootMixin, GitHub):
+    """Current status of GHE repositories."""
+
+    REQUIRED = GitHub.REQUIRED | CustomRootMixin.REQUIRED
+
+
+class GitHubEnterpriseIssues(CustomRootMixin, GitHubIssues):
+    """Issues and pull requests from GHE repositories."""
+
+    REQUIRED = GitHubIssues.REQUIRED | CustomRootMixin.REQUIRED

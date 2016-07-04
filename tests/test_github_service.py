@@ -4,7 +4,7 @@ from unittest import mock
 import pytest
 
 from flash_services.core import Service
-from flash_services.github import GitHub
+from flash_services.github import GitHub, GitHubEnterprise
 
 
 @pytest.fixture
@@ -28,6 +28,13 @@ def test_correct_config():
     assert GitHub.TEMPLATE == 'vcs-section'
 
 
+def test_correct_enterprise_config():
+    assert GitHubEnterprise.AUTH_PARAM == 'access_token'
+    assert GitHubEnterprise.REQUIRED == {'api_token', 'account', 'repo', 'root'}
+    assert GitHubEnterprise.ROOT == ''
+    assert GitHubEnterprise.TEMPLATE == 'vcs-section'
+
+
 TWO_DAYS_AGO = (datetime.now() - timedelta(days=2, hours=12)).strftime(
     '%Y-%m-%dT%H:%M:%SZ',
 )
@@ -47,6 +54,33 @@ def test_update_success(get, debug, service):
 
     get.assert_called_once_with(
         'https://api.github.com/repos/foo/bar/commits?access_token=foobar',
+        headers={'User-Agent': 'bar'}
+    )
+    debug.assert_called_once_with('fetching GitHub project data')
+    assert result == {'commits': [{
+        'message': 'commit message',
+        'author': 'alice [bob]',
+        'committed': 'two days ago'
+    }], 'name': 'foo/bar'}
+
+
+@mock.patch('flash_services.github.logger.debug')
+@mock.patch('flash_services.github.requests.get', **{
+    'return_value.status_code': 200,
+    'return_value.json.return_value': [{'commit': {
+        'author': {'name': 'alice'},
+        'committer': {'name': 'bob', 'date': TWO_DAYS_AGO},
+        'message': 'commit message',
+    }}],
+})
+def test_update_enterprise_success(get, debug):
+    service = GitHubEnterprise(api_token='foobar', account='foo', repo='bar',
+                               root='http://dummy.url')
+
+    result = service.update()
+
+    get.assert_called_once_with(
+        'http://dummy.url/repos/foo/bar/commits?access_token=foobar',
         headers={'User-Agent': 'bar'}
     )
     debug.assert_called_once_with('fetching GitHub project data')
