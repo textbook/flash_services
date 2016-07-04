@@ -1,13 +1,14 @@
 """Defines the GitHub service integration."""
 
-import logging
 from collections import defaultdict, OrderedDict
+from datetime import timedelta
+import logging
 
 import requests
 
 from .auth import UrlParamMixin
 from .core import CustomRootMixin, VersionControlService
-from .utils import occurred
+from .utils import naturaldelta, occurred, safe_parse
 
 
 logger = logging.getLogger(__name__)
@@ -149,10 +150,56 @@ class GitHubIssues(GitHub):
                 counts['{}-pull-requests'.format(issue['state'])] += 1
             else:
                 counts['{}-issues'.format(issue['state'])] += 1
+        half_life = cls.half_life(data)
         return dict(
+            halflife=naturaldelta(half_life),
+            health=cls.health_summary(half_life),
             issues=counts,
             name=name,
         )
+
+    @staticmethod
+    def half_life(issues):
+        """Calculate the half life of the service's issues.
+
+        Args:
+          issues (:py:class:`list`): The service's issue data.
+
+        Returns:
+          :py:class:`datetime.timedelta`: The half life of the issues.
+
+        """
+        lives = []
+        for issue in issues:
+            start = safe_parse(issue.get('created_at'))
+            end = safe_parse(issue.get('closed_at'))
+            if start and end:
+                lives.append(end - start)
+        if lives:
+            lives.sort()
+            size = len(lives)
+            return lives[((size + (size % 2)) // 2) - 1]
+
+    @staticmethod
+    def health_summary(half_life):
+        """Calculate the health of the service.
+
+        Args:
+          half_life (:py:class:`datetime.timedelta`): The half life of
+            the service's issues.
+
+        Returns:
+          :py:class:`str`: The health of the service, either ``'ok'``,
+            ``'neutral'`` or ``'error'``.
+
+        """
+        if half_life is None:
+            return 'neutral'
+        if half_life < timedelta(weeks=1):
+            return 'ok'
+        elif half_life < timedelta(days=30):
+            return 'neutral'
+        return 'error'
 
 
 class GitHubEnterprise(CustomRootMixin, GitHub):

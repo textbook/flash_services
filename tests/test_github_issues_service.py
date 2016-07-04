@@ -44,7 +44,7 @@ def test_update_success(get, debug, service):
         headers={'User-Agent': 'bar'}
     )
     debug.assert_called_once_with('fetching GitHub issue data')
-    assert result == {'issues': {}, 'name': 'foo/bar'}
+    assert result == {'issues': {}, 'name': 'foo/bar', 'health': 'neutral', 'halflife': None}
 
 
 @mock.patch('flash_services.github.logger.debug')
@@ -63,7 +63,7 @@ def test_update_enterprise_success(get, debug):
         headers={'User-Agent': 'bar'}
     )
     debug.assert_called_once_with('fetching GitHub issue data')
-    assert result == {'issues': {}, 'name': 'foo/bar'}
+    assert result == {'issues': {}, 'name': 'foo/bar', 'health': 'neutral', 'halflife': None}
 
 
 @mock.patch('flash_services.github.logger.error')
@@ -82,18 +82,52 @@ def test_update_failure(get, error, service):
 
 
 @pytest.mark.parametrize('input_, expected', [
-    (('hello', []), dict(name='hello', issues={})),
+    (('hello', []), dict(name='hello', issues={}, health='neutral', halflife=None)),
     (
         ('hello', [{'state': 'open'}, {'state': 'open'}]),
-        dict(name='hello', issues={'open-issues': 2}),
+        dict(name='hello', issues={'open-issues': 2}, health='neutral', halflife=None),
     ),
     (
         ('hello', [{'state': 'open'}, {'state': 'closed'}]),
-        dict(name='hello', issues={'open-issues': 1, 'closed-issues': 1}),
+        dict(name='hello', issues={'open-issues': 1, 'closed-issues': 1}, health='neutral', halflife=None),
     ),
     (
         ('hello', [{'state': 'open'}, {'state': 'open', 'pull_request': {}}]),
-        dict(name='hello', issues={'open-issues': 1, 'open-pull-requests': 1}),
+        dict(name='hello', issues={'open-issues': 1, 'open-pull-requests': 1}, health='neutral', halflife=None),
+    ),
+    (
+        ('hello', [{'state': 'closed', 'created_at': '2010/11/12', 'closed_at': '2010/11/14'}]),
+        dict(name='hello', issues={'closed-issues': 1}, health='ok', halflife='two days'),
+    ),
+    (
+        ('hello', [{'state': 'closed', 'created_at': '2010/11/12', 'closed_at': '2010/11/22'}]),
+        dict(name='hello', issues={'closed-issues': 1}, health='neutral', halflife='ten days'),
+    ),
+    (
+        ('hello', [{'state': 'closed', 'created_at': '2010/10/12', 'closed_at': '2010/11/14'}]),
+        dict(name='hello', issues={'closed-issues': 1}, health='error', halflife='a month'),
+    ),
+    (
+        ('hello', [
+            {'state': 'closed', 'created_at': '2010/10/12', 'closed_at': '2010/10/15'},
+            {'state': 'closed', 'created_at': '2010/10/12', 'closed_at': '2010/10/16'},
+            {'state': 'open', 'created_at': '2010/10/12', 'closed_at': None},
+        ]),
+        dict(name='hello', issues={'closed-issues': 2, 'open-issues': 1}, health='ok', halflife='three days'),
+    ),
+    (
+        ('hello', [
+            {'state': 'closed', 'created_at': '2010/10/12', 'closed_at': '2010/10/15'},
+            {'state': 'closed', 'created_at': '2010/10/12', 'closed_at': '2010/10/16', 'pull_request': {}},
+            {'state': 'closed', 'created_at': '2010/10/12', 'closed_at': '2010/10/17'},
+            {'state': 'open', 'created_at': '2010/10/12', 'closed_at': None},
+        ]),
+        dict(
+            name='hello',
+            issues={'closed-issues': 2, 'closed-pull-requests': 1, 'open-issues': 1},
+            health='ok',
+            halflife='four days',
+        ),
     ),
 ])
 def test_format_data(input_, expected):

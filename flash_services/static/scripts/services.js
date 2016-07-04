@@ -7,6 +7,7 @@ function builds(pane, data) {
 }
 
 function gh_issues(pane, data) {
+  pane.find('.half-life').text(data.halflife || 'N/A');
   if (data.issues) {
     var states = ['open-issues', 'closed-issues', 'open-pull-requests',
                   'closed-pull-requests'];
