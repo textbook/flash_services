@@ -62,7 +62,12 @@ The following service definitions include the configuration options:
   * ``api_token`` (required),
   * ``account`` (required - the name of the account the project is in, e.g.
     ``"textbook"``)
-  * ``repo`` (required
+  * ``repo`` (required - the name of the project repository within that account,
+    e.g. ``"flash"``)
+  * ``neutral_threshold`` (the maximum half life to show as a neutral state,
+    in days, defaults to 30)
+  * ``ok_threshold`` (the maximum half life to show as an OK state, in days,
+    defaults to 7)
 
 * ``ghe_issues`` - for issues and PRs in project repositories on
   `GitHub Enterprise`_ installations
@@ -72,6 +77,10 @@ The following service definitions include the configuration options:
     ``"textbook"``)
   * ``repo`` (required - the name of the project repository within that account,
     e.g. ``"flash"``)
+  * ``neutral_threshold`` (the maximum half life to show as a neutral state,
+    in days, defaults to 30)
+  * ``ok_threshold`` (the maximum half life to show as an OK state, in days,
+    defaults to 7)
 
 * ``github`` - for project repositories on `GitHub`_
 

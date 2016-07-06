@@ -158,3 +158,26 @@ class CustomRootMixin:
             root = self.root
         return super().url_builder(endpoint=endpoint, root=root, params=params,
                                    url_params=url_params)
+
+
+class ThresholdMixin:
+    """Mix-in class for defining health thresholds.
+
+    Attributes:
+      NEUTRAL_THRESHOLD: The threshold beyond which the service is
+        considered to be in an error state.
+      OK_THRESHOLD: The threshold beyond which the service is
+        considered to be in a neutral state.
+
+    """
+
+    NEUTRAL_THRESHOLD = None
+    OK_THRESHOLD = None
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.ok_threshold = int(kwargs.get('ok_threshold', self.OK_THRESHOLD))
+        self.neutral_threshold = int(kwargs.get(
+            'neutral_threshold',
+            self.NEUTRAL_THRESHOLD
+        ))

@@ -130,5 +130,17 @@ def test_update_failure(get, error, service):
         ),
     ),
 ])
-def test_format_data(input_, expected):
-    assert GitHubIssues.format_data(*input_) == expected
+def test_format_data(input_, expected, service):
+    assert service.format_data(*input_) == expected
+
+
+def test_adjust_threshold():
+    service = GitHubIssues(ok_threshold=1, account='', repo='', api_token='')
+    assert service.ok_threshold == 1
+    assert service.neutral_threshold == 30
+    issues = [
+        {'state': 'closed', 'created_at': '2010/10/12', 'closed_at': '2010/10/15'},
+    ]
+    assert service.format_data('', issues).get('health') == 'neutral'
+    service.neutral_threshold = 2
+    assert service.format_data('', issues).get('health') == 'error'

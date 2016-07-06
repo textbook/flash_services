@@ -7,13 +7,13 @@ import logging
 import requests
 
 from .auth import Unauthenticated
-from .core import Service
+from .core import Service, ThresholdMixin
 from .utils import occurred, remove_tags
 
 logger = logging.getLogger(__name__)
 
 
-class Coveralls(Unauthenticated, Service):
+class Coveralls(Unauthenticated, ThresholdMixin, Service):
     """Show the current status of a Coveralls repository.
 
     Arguments:
@@ -33,6 +33,8 @@ class Coveralls(Unauthenticated, Service):
     """
 
     FRIENDLY_NAME = 'Coveralls'
+    NEUTRAL_THRESHOLD = 50
+    OK_THRESHOLD = 80
     REQUIRED = {'vcs_name', 'account', 'repo'}
     ROOT = 'https://coveralls.io'
     TEMPLATE = 'coveralls-section'
@@ -42,8 +44,6 @@ class Coveralls(Unauthenticated, Service):
         self.account = account
         self.repo = repo
         self.vcs_name = vcs_name
-        self.ok_threshold = kwargs.get('ok_threshold', 80)
-        self.neutral_threshold = kwargs.get('neutral_threshold', 50)
 
     @property
     def repo_name(self):

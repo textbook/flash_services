@@ -7,7 +7,7 @@ import logging
 import requests
 
 from .auth import UrlParamMixin
-from .core import CustomRootMixin, VersionControlService
+from .core import CustomRootMixin, ThresholdMixin, VersionControlService
 from .utils import naturaldelta, occurred, safe_parse
 
 
@@ -115,10 +115,12 @@ class GitHub(UrlParamMixin, VersionControlService):
         ))
 
 
-class GitHubIssues(GitHub):
+class GitHubIssues(ThresholdMixin, GitHub):
     """Show the current status of GitHub issues and pull requests."""
 
     FRIENDLY_NAME = 'GitHub Issues'
+    NEUTRAL_THRESHOLD = 30
+    OK_THRESHOLD = 7
     TEMPLATE = 'gh-issues-section'
 
     def __init__(self, *, api_token, account, repo, **kwargs):
@@ -142,18 +144,17 @@ class GitHubIssues(GitHub):
         logger.error('failed to update GitHub issue data')
         return {}
 
-    @classmethod
-    def format_data(cls, name, data):
+    def format_data(self, name, data):
         counts = defaultdict(int)
         for issue in data:
             if issue.get('pull_request') is not None:
                 counts['{}-pull-requests'.format(issue['state'])] += 1
             else:
                 counts['{}-issues'.format(issue['state'])] += 1
-        half_life = cls.half_life(data)
+        half_life = self.half_life(data)
         return dict(
             halflife=naturaldelta(half_life),
-            health=cls.health_summary(half_life),
+            health=self.health_summary(half_life),
             issues=counts,
             name=name,
         )
@@ -180,8 +181,7 @@ class GitHubIssues(GitHub):
             size = len(lives)
             return lives[((size + (size % 2)) // 2) - 1]
 
-    @staticmethod
-    def health_summary(half_life):
+    def health_summary(self, half_life):
         """Calculate the health of the service.
 
         Args:
@@ -195,9 +195,9 @@ class GitHubIssues(GitHub):
         """
         if half_life is None:
             return 'neutral'
-        if half_life < timedelta(weeks=1):
+        if half_life <= timedelta(days=self.ok_threshold):
             return 'ok'
-        elif half_life < timedelta(days=30):
+        elif half_life <= timedelta(days=self.neutral_threshold):
             return 'neutral'
         return 'error'
 
