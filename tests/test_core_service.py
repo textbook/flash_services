@@ -28,7 +28,7 @@ def test_required_config(config):
         Test.from_config(**config)
     message = excinfo.value.args[0]
     assert 'missing required config keys' in message
-    assert 'from <unnamed>' in message
+    assert 'from Test' in message
 
 
 @pytest.mark.parametrize('args, kwargs, expected', [

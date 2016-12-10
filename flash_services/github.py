@@ -31,7 +31,6 @@ class GitHub(UrlParamMixin, VersionControlService):
     """
 
     AUTH_PARAM = 'access_token'
-    FRIENDLY_NAME = 'GitHub'
     REQUIRED = {'api_token', 'account', 'repo'}
     ROOT = 'https://api.github.com'
 
