@@ -225,7 +225,7 @@ TRACKER_STORY = re.compile(r'''
 def remove_tags(commit_message):
     """Remove issue/tracker tags from a commit message.
 
-    Notes:
+    Note:
       Currently implemented for :py:class:`~.Tracker` and
       :py:class:`~.GitHub` commit messages.
 

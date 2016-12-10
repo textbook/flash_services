@@ -84,7 +84,7 @@ class Service(metaclass=ABCMeta):
     def calculate_timeout(http_date):
         """Extract request timeout from e.g. ``Retry-After`` header.
 
-        Notes:
+        Note:
           Per :rfc:`2616#section-14.37`, the ``Retry-After`` header can
           be either an integer number of seconds or an HTTP date. This
           function can handle either.
@@ -119,10 +119,10 @@ class ContinuousIntegrationService(Service):
         if outcome not in cls.OUTCOMES:
             logger.warning('unknown outcome: %s', outcome)
         return dict(
-            author=build.get('author', escape('<no author>')),
+            author=build.get('author') or escape('<no author>'),
             duration=build.get('duration'),
             elapsed=build.get('elapsed'),
-            message=build.get('message', escape('<no message>')),
+            message=build.get('message') or escape('<no message>'),
             outcome=cls.OUTCOMES.get(outcome),
             started_at=build.get('started_at'),
         )

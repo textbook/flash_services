@@ -10,11 +10,12 @@ from .codeship import Codeship
 from .coveralls import Coveralls
 from .github import (GitHub, GitHubEnterprise, GitHubEnterpriseIssues,
                      GitHubIssues)
+from .jenkins import Jenkins
 from .tracker import Tracker
 from .travis import TravisOS, TravisPro
 
 __author__ = 'Jonathan Sharpe'
-__version__ = '0.3.6'
+__version__ = '0.3.7'
 
 blueprint = Blueprint(
     'services',
@@ -32,6 +33,7 @@ SERVICES = dict(
     github_enterprise=GitHubEnterprise,
     gh_issues=GitHubIssues,
     ghe_issues=GitHubEnterpriseIssues,
+    jenkins=Jenkins,
     tracker=Tracker,
     travis=TravisOS,
     travis_pro=TravisPro,

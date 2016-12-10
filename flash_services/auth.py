@@ -1,6 +1,7 @@
 """Mix-in classes for implementing service authentication."""
 # pylint: disable=too-few-public-methods
 
+from base64 import b64encode
 from collections import OrderedDict
 
 
@@ -56,4 +57,26 @@ class HeaderMixin(TokenAuthMixin):
         headers = super().headers
         template = 'token "{}"' if self.AUTH_HEADER == 'Authorization' else '{}'
         headers.update({self.AUTH_HEADER: template.format(self.api_token)})
+        return headers
+
+
+class BasicAuthHeaderMixin:
+    """Mix-in class for HTTP Basic auth."""
+
+    REQUIRED = {'username', 'password'}
+
+    def __init__(self, *, username, password, **kwargs):
+        self.username = username
+        self.password = password
+        super().__init__(**kwargs)
+
+    @property
+    def headers(self):
+        encoding = 'utf8'
+        headers = super().headers
+        token = b64encode(bytes('{}:{}'.format(
+            self.username,
+            self.password
+        ), encoding))
+        headers['Authorization'] = 'Basic {}'.format(str(token, encoding))
         return headers

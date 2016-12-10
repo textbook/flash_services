@@ -103,6 +103,13 @@ The following service definitions include the configuration options:
   * ``branch`` (the name of the branch to show commits from, defaulting to the
     repository's default branch, which is usually ``master``)
 
+* ``jenkins`` - for CI builds on `Jenkins`_ instances.
+
+  * ``username`` (required)
+  * ``password`` (required)
+  * ``root`` (required - the root URL for the Jenkins instance)
+  * ``job`` (required - the name of the job, which must match the job URL)
+
 * ``tracker`` - for projects on `Pivotal Tracker`_
 
   * ``api_token`` (required)
@@ -139,6 +146,7 @@ behaviour should live in a new function in the ``SERVICES`` object in
 .. _Flash: https://github.com/textbook/flash
 .. _GitHub: https://github.com/
 .. _GitHub Enterprise: https://enterprise.github.com/home
+.. _Jenkins: https://jenkins.io/
 .. _Jinja2: http://jinja.pocoo.org/
 .. _Pivotal Tracker: https://www.pivotaltracker.com/
 .. _PythonHosted: https://pythonhosted.org/flash_services
