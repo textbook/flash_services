@@ -38,6 +38,7 @@ var SERVICES = {
   ghe_issues: gh_issues,
   github: github,
   github_enterprise: github,
+  jenkins: builds,
   tracker: function (pane, data) {
     if (data.velocity) { pane.find('.velocity').text(data.velocity); }
     if (data.stories) {
