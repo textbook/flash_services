@@ -99,10 +99,10 @@ def test_unfinished_formatting(_, service):
     assert result == dict(
         name='foo',
         builds=[dict(
-            author='&lt;no author&gt;',
+            author='<no author>',
             duration=5,
             elapsed='estimate not available',
-            message='&lt;no message&gt;',
+            message='<no message>',
             outcome='working',
             started_at=1481387964,
         )],
@@ -126,10 +126,10 @@ def test_estimated_formatting(_, __, service):
     result = service.format_data(response)
 
     assert result['builds'][0] == dict(
-        author='&lt;no author&gt;',
+        author='<no author>',
         duration=5,
         elapsed='five seconds left',
-        message='&lt;no message&gt;',
+        message='<no message>',
         outcome='working',
         started_at=1481387964,
     )

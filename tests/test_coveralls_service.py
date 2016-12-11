@@ -99,7 +99,7 @@ def test_format_build_missing_data(service):
     result = service.format_build({})
 
     assert result == dict(
-        author='&lt;no author&gt;',
+        author='<no author>',
         committed='time not available',
         coverage=None,
         message_text=None,

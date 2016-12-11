@@ -107,7 +107,7 @@ def test_update_failure(get, error, service):
 
 
 @pytest.mark.parametrize('input_, expected', [
-    (dict(), dict(author=None, committed='time not available', message='')),
+    (dict(), dict(author='<no author>', committed='time not available', message='')),
     (
         dict(
             author=dict(name='alice'),
