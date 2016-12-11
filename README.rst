@@ -142,8 +142,9 @@ validation are supported).
 * Set the ``FRIENDLY_NAME``, for display in the top-left of each pane, if not
   the same as the class name;
 * Register the service in **both** ``SERVICES`` objects, using the same key:
-  * in Python (`__init__.py`); and
-  * in JavaScript (`static/scripts/services.js`, where any service-specific
+
+  * in Python (``__init__.py``); and
+  * in JavaScript (``static/scripts/services.js``, where any service-specific
     client-side behaviour should also be placed).
 
 .. _Codeship: https://codeship.com/
