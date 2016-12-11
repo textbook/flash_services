@@ -136,10 +136,15 @@ classes in ``auth.py`` can be used to implement authentication to the service
 API endpoint as needed (currently both header and query parameter token
 validation are supported).
 
-Any service-specific partial templates (using the `Jinja2`_ templating language)
-should be placed in ``templates/partials`` and service-specific client-side
-behaviour should live in a new function in the ``SERVICES`` object in
-``static/scripts/services.js``, keyed by the ``FRIENDLY_NAME`` of the service.
+* Create a new ``Service`` subclass;
+* Set the appropriate ``TEMPLATE`` for it (if not a standard template, add it
+  to ``templates/partials`` - use the `Jinja2`_ templating language);
+* Set the ``FRIENDLY_NAME``, for display in the top-left of each pane, if not
+  the same as the class name;
+* Register the service in **both** ``SERVICES`` objects, using the same key:
+  * in Python (`__init__.py`); and
+  * in JavaScript (`static/scripts/services.js`, where any service-specific
+    client-side behaviour should also be placed).
 
 .. _Codeship: https://codeship.com/
 .. _Coveralls: https://coveralls.io/
