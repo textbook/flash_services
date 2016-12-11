@@ -31,7 +31,7 @@ class GitHub(UrlParamMixin, VersionControlService):
     """
 
     AUTH_PARAM = 'access_token'
-    REQUIRED = {'api_token', 'account', 'repo'}
+    REQUIRED = {'account', 'repo'}
     ROOT = 'https://api.github.com'
 
     def __init__(self, *, api_token, account, repo, branch=None, **kwargs):
@@ -204,10 +204,10 @@ class GitHubIssues(ThresholdMixin, GitHub):
 class GitHubEnterprise(CustomRootMixin, GitHub):
     """Current status of GHE repositories."""
 
-    REQUIRED = GitHub.REQUIRED | CustomRootMixin.REQUIRED
+    FRIENDLY_NAME = 'GitHub'
 
 
 class GitHubEnterpriseIssues(CustomRootMixin, GitHubIssues):
     """Issues and pull requests from GHE repositories."""
 
-    REQUIRED = GitHubIssues.REQUIRED | CustomRootMixin.REQUIRED
+    FRIENDLY_NAME = 'GitHub Issues'

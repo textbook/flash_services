@@ -26,7 +26,7 @@ class Tracker(HeaderMixin, Service):
 
     AUTH_HEADER = 'X-TrackerToken'
     FRIENDLY_NAME = 'Pivotal Tracker'
-    REQUIRED = {'api_token', 'project_id'}
+    REQUIRED = {'project_id'}
     ROOT = 'https://www.pivotaltracker.com/services/v5'
     TEMPLATE = 'tracker-section'
 

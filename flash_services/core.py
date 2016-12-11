@@ -13,7 +13,36 @@ from .utils import remove_tags
 logger = logging.getLogger(__name__)
 
 
-class Service(metaclass=ABCMeta):
+class MetaService(ABCMeta):
+    """Metaclass to simplify configuration."""
+
+    def __new__(mcs, name, bases, attrs):
+        """Update the new class with appropriate attributes.
+
+        Arguments:
+          mcs (:py:class:`type`): The newly-created class.
+          name (:py:class:`str`): The name of the class.
+          bases (:py:class:`tuple`): The base classes of the class.
+          attrs (:py:class:`dict`): The attributes of the class.
+
+        Returns:
+          :py:class:`type`: The class, updated.
+
+        Note:
+          The ``REQUIRED`` configuration of each class is the union of
+          the required configuration keys of all of its base classes.
+          The ``FRIENDLY_NAME`` defaults to ``name`` if not explicitly
+          provided.
+
+        """
+        attrs['REQUIRED'] = attrs.get('REQUIRED', set()).union(
+            *(getattr(base, 'REQUIRED', set()) for base in bases)
+        )
+        attrs['FRIENDLY_NAME'] = attrs.get('FRIENDLY_NAME', name)
+        return super().__new__(mcs, name, bases, attrs)
+
+
+class Service(metaclass=MetaService):
     """Abstract base class for services."""
 
     FRIENDLY_NAME = None

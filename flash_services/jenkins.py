@@ -34,12 +34,7 @@ class Jenkins(BasicAuthHeaderMixin, CustomRootMixin,
         'SUCCESS': 'passed',
     }
 
-    REQUIRED = {'job'}.union(
-        BasicAuthHeaderMixin.REQUIRED,
-        ContinuousIntegrationService.REQUIRED,
-        CustomRootMixin.REQUIRED,
-    )
-
+    REQUIRED = {'job'}
 
     TREE_PARAMS = 'name,builds[timestamp,duration,result,description,changeSets[items[author[fullName],comment]]]'  # pylint: disable=line-too-long
     """:py:class:`str`: Definition of JSON tree to return."""

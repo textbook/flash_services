@@ -23,6 +23,7 @@ def test_tracker_service_type():
 
 def test_correct_config():
     assert GitHub.AUTH_PARAM == 'access_token'
+    assert GitHub.FRIENDLY_NAME == 'GitHub'
     assert GitHub.REQUIRED == {'api_token', 'account', 'repo'}
     assert GitHub.ROOT == 'https://api.github.com'
     assert GitHub.TEMPLATE == 'vcs-section'
@@ -30,6 +31,7 @@ def test_correct_config():
 
 def test_correct_enterprise_config():
     assert GitHubEnterprise.AUTH_PARAM == 'access_token'
+    assert GitHubEnterprise.FRIENDLY_NAME == 'GitHub'
     assert GitHubEnterprise.REQUIRED == {'api_token', 'account', 'repo', 'root'}
     assert GitHubEnterprise.ROOT == ''
     assert GitHubEnterprise.TEMPLATE == 'vcs-section'

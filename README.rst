@@ -136,7 +136,12 @@ classes in ``auth.py`` can be used to implement authentication to the service
 API endpoint as needed (currently both header and query parameter token
 validation are supported).
 
-* Create a new ``Service`` subclass;
+* Create a new ``Service`` subclass, or use one of the pre-provided
+  subclasses for continuous integration or version control systems;
+* Use the mix-ins from ``auth.py`` and ``core.py`` to add any required
+  authentication, custom root setting and/or health thresholds;
+* Define any additional ``REQUIRED`` configuration parameters on the class
+  (required parameters from its superclasses will be added automatically);
 * Set the appropriate ``TEMPLATE`` for it (if not a standard template, add it
   to ``templates/partials`` - use the `Jinja2`_ templating language);
 * Set the ``FRIENDLY_NAME``, for display in the top-left of each pane, if not

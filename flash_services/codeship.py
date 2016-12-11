@@ -29,7 +29,7 @@ class Codeship(UrlParamMixin, ContinuousIntegrationService):
         'success': 'passed',
         'testing': 'working',
     }
-    REQUIRED = {'api_token', 'project_id'}
+    REQUIRED = {'project_id'}
     ROOT = 'https://codeship.com/api/v1'
 
     def __init__(self, *, api_token, project_id, **kwargs):

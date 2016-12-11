@@ -12,6 +12,8 @@ class Unauthenticated:
 class TokenAuthMixin:
     """Mix-in class for implementing token authentication."""
 
+    REQUIRED = {'api_token'}
+
     TOKEN_ENV_VAR = None
     """:py:class:`str`: The environment variable holding the token."""
 

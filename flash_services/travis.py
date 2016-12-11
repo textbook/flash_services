@@ -129,5 +129,4 @@ class TravisPro(HeaderMixin, TravisOS):
     """
 
     AUTH_HEADER = 'Authorization'
-    REQUIRED = TravisOS.REQUIRED.union({'api_token'})
     ROOT = TravisOS.ROOT.replace('.org', '.com')

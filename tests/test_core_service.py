@@ -63,3 +63,10 @@ def test_calculate_timeout_http_date():
     assert 179 <= Service.calculate_timeout(
         three_minutes_later.strftime(http_date),
     ) <= 181
+
+
+def test_abstract_methods_required():
+    with pytest.raises(TypeError):
+        class Broken(Service):
+            pass
+        Broken()
