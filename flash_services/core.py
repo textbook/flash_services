@@ -3,7 +3,6 @@
 from abc import ABCMeta, abstractmethod
 from datetime import datetime
 from datetime import timezone
-from html import escape
 import logging
 from urllib.parse import urlencode
 
@@ -119,10 +118,10 @@ class ContinuousIntegrationService(Service):
         if outcome not in cls.OUTCOMES:
             logger.warning('unknown outcome: %s', outcome)
         return dict(
-            author=build.get('author') or escape('<no author>'),
+            author=build.get('author') or '<no author>',
             duration=build.get('duration'),
             elapsed=build.get('elapsed'),
-            message=build.get('message') or escape('<no message>'),
+            message=build.get('message') or '<no message>',
             outcome=cls.OUTCOMES.get(outcome),
             started_at=build.get('started_at'),
         )
@@ -137,9 +136,9 @@ class VersionControlService(Service):
     @abstractmethod
     def format_commit(cls, commit):
         return dict(
-            author=commit.get('author', escape('<no author>')),
+            author=commit.get('author') or '<no author>',
             committed=commit.get('committed'),
-            message=remove_tags(commit.get('message', '')),
+            message=remove_tags(commit.get('message') or ''),
         )
 
 

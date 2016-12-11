@@ -1,7 +1,6 @@
 """Defines the GitHub service integration."""
 
 from collections import OrderedDict
-from html import escape
 import logging
 
 import requests
@@ -107,7 +106,7 @@ class Coveralls(Unauthenticated, ThresholdMixin, Service):
         coverage = build.get('covered_percent')
         message = build.get('commit_message')
         return dict(
-            author=build.get('committer_name', escape('<no author>')),
+            author=build.get('committer_name') or '<no author>',
             committed=occurred(build.get('created_at')),
             coverage=None if coverage is None else '{:.1f}%'.format(coverage),
             message_text=remove_tags(message) if message else None,
