@@ -73,7 +73,7 @@ class Jenkins(BasicAuthHeaderMixin, CustomRootMixin,
         builds = [cls.format_build(build) for build in data['builds']]
         estimate_time(builds)
         return dict(
-            builds=builds,
+            builds=builds[:4],
             health=health_summary(builds),
             name=data['name'],
         )

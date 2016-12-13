@@ -150,10 +150,13 @@ def test_estimated_formatting(_, __, service):
         dict(duration=10000, description=None, timestamp=1481387964313, result='SUCCESS'),
         dict(duration=10000, description=None, timestamp=1481387964313, result='SUCCESS'),
         dict(duration=10000, description=None, timestamp=1481387964313, result='SUCCESS'),
+        dict(duration=10000, description=None, timestamp=1481387964313, result='SUCCESS'),
+        dict(duration=10000, description=None, timestamp=1481387964313, result='SUCCESS'),
     ])
 
     result = service.format_data(response)
 
+    assert len(result['builds']) == 4
     assert result['builds'][0] == dict(
         author='<no author>',
         duration=5,
