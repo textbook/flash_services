@@ -32,6 +32,7 @@ class Jenkins(BasicAuthHeaderMixin, CustomRootMixin,
         'FAILURE': 'failed',
         'UNSTABLE': 'failed',
         'SUCCESS': 'passed',
+        'ABORTED': 'cancelled',
     }
 
     REQUIRED = {'job'}

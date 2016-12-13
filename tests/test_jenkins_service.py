@@ -83,6 +83,33 @@ def test_formatting():
     )
 
 
+def test_aborted_formatting():
+    response = dict(
+        name='job',
+        builds=[dict(
+            duration=1234,
+            description=None,
+            timestamp=1481387964313,
+            result='ABORTED',
+        )],
+    )
+
+    result = Jenkins.format_data(response)
+
+    assert result == dict(
+        name='job',
+        builds=[dict(
+            author='<no author>',
+            duration=1,
+            elapsed='took a second',
+            message='<no message>',
+            outcome='cancelled',
+            started_at=1481387964,
+        )],
+        health='neutral',
+    )
+
+
 @mock.patch('flash_services.jenkins.time.time', return_value=1481387969.3)
 def test_unfinished_formatting(_, service):
     response = dict(
