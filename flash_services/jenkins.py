@@ -123,7 +123,7 @@ class Jenkins(BasicAuthHeaderMixin, CustomRootMixin,
         changes = build.get('changeSets')
         if not changes:
             return None, None
-        items = changes[0].get('items')
+        items = changes[-1].get('items')
         if not items:
             return None, None
         item = items[0]

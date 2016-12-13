@@ -53,14 +53,16 @@ def test_update_failure(_, error, service):
 
 def test_formatting():
     response = dict(
-        name='foo',
+        name='job',
         builds=[dict(
             duration=31698,
             description=None,
             timestamp=1481387964313,
             result='SUCCESS',
             changeSets=[
-                dict(items=[dict(comment='hello', author=dict(fullName='who'))])
+                dict(items=[dict(comment='hello', author=dict(fullName='foo'))]),
+                dict(items=[dict(comment='world', author=dict(fullName='bar'))]),
+                dict(items=[dict(comment='again', author=dict(fullName='baz'))]),
             ]
         )],
     )
@@ -68,12 +70,12 @@ def test_formatting():
     result = Jenkins.format_data(response)
 
     assert result == dict(
-        name='foo',
+        name='job',
         builds=[dict(
-            author='who',
+            author='baz',
             duration=31,
             elapsed='took 31 seconds',
-            message='hello',
+            message='again',
             outcome='passed',
             started_at=1481387964,
         )],
