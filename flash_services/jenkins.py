@@ -95,6 +95,9 @@ class Jenkins(BasicAuthHeaderMixin, CustomRootMixin,
         """
         started_at = build['timestamp'] // 1000
         duration = (build['duration'] // 1000) or None
+        if build['duration'] == 0 and build['result'] == 'SUCCESS':
+            # this is a lie, do not be fooled - textbook/flash_services#16
+            build['result'] = None
         if duration is not None:
             elapsed = 'took {}'.format(naturaldelta(duration))
         else:
