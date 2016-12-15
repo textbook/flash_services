@@ -29,6 +29,7 @@ class Jenkins(BasicAuthHeaderMixin, CustomRootMixin,
 
     OUTCOMES = {
         None: 'working',
+        'WORKING': 'working',
         'FAILURE': 'failed',
         'UNSTABLE': 'failed',
         'SUCCESS': 'passed',
@@ -37,7 +38,7 @@ class Jenkins(BasicAuthHeaderMixin, CustomRootMixin,
 
     REQUIRED = {'job'}
 
-    TREE_PARAMS = 'name,builds[timestamp,duration,result,description,changeSets[items[author[fullName],comment]]]'  # pylint: disable=line-too-long
+    TREE_PARAMS = 'name,builds[building,timestamp,duration,result,description,changeSets[items[author[fullName],comment]]]'  # pylint: disable=line-too-long
     """:py:class:`str`: Definition of JSON tree to return."""
 
     def __init__(self, *, job, **kwargs):
@@ -95,9 +96,8 @@ class Jenkins(BasicAuthHeaderMixin, CustomRootMixin,
         """
         started_at = build['timestamp'] // 1000
         duration = (build['duration'] // 1000) or None
-        if build['duration'] == 0 and build['result'] == 'SUCCESS':
-            # this is a lie, do not be fooled - textbook/flash_services#16
-            build['result'] = None
+        if build.get('building'):
+            build['result'] = 'WORKING'
         if duration is not None:
             elapsed = 'took {}'.format(naturaldelta(duration))
         else:

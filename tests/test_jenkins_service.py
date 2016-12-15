@@ -115,35 +115,7 @@ def test_unfinished_formatting(_, service):
     response = dict(
         name='foo',
         builds=[dict(
-            duration=0,
-            description=None,
-            timestamp=1481387964313,
-            result=None,
-            changeSets=[],
-        )],
-    )
-
-    result = service.format_data(response)
-
-    assert result == dict(
-        name='foo',
-        builds=[dict(
-            author='<no author>',
-            duration=5,
-            elapsed='estimate not available',
-            message='<no message>',
-            outcome='working',
-            started_at=1481387964,
-        )],
-        health='neutral',
-    )
-
-
-@mock.patch('flash_services.jenkins.time.time', return_value=1481387969.3)
-def test_fake_finished_formatting(_, service):
-    response = dict(
-        name='foo',
-        builds=[dict(
+            building=True,
             duration=0,
             description=None,
             timestamp=1481387964313,
