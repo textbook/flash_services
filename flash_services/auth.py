@@ -49,16 +49,9 @@ class HeaderMixin(TokenAuthMixin):
 
     @property
     def headers(self):
-        """Add authentication header.
-
-        Note:
-          There is a special case for ``'Authorization'`` headers; the
-          provided token is formatted as ``'token "the token"'``.
-
-        """
+        """Add authentication header."""
         headers = super().headers
-        template = 'token "{}"' if self.AUTH_HEADER == 'Authorization' else '{}'
-        headers.update({self.AUTH_HEADER: template.format(self.api_token)})
+        headers.update({self.AUTH_HEADER: self.api_token})
         return headers
 
 

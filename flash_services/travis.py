@@ -114,6 +114,7 @@ class TravisOS(ContinuousIntegrationService):
             started_at=start,
         ))
 
+
 class TravisPro(HeaderMixin, TravisOS):
     """Show the current status of a pro (travis-ci.com) project.
 
@@ -130,3 +131,7 @@ class TravisPro(HeaderMixin, TravisOS):
 
     AUTH_HEADER = 'Authorization'
     ROOT = TravisOS.ROOT.replace('.org', '.com')
+
+    def __init__(self, **kwargs):
+        kwargs['api_token'] = 'token "{}"'.format(kwargs['api_token'])
+        super().__init__(**kwargs)
