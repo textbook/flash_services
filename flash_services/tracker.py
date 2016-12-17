@@ -26,12 +26,11 @@ class Tracker(HeaderMixin, Service):
 
     AUTH_HEADER = 'X-TrackerToken'
     FRIENDLY_NAME = 'Pivotal Tracker'
-    REQUIRED = {'project_id'}
     ROOT = 'https://www.pivotaltracker.com/services/v5'
     TEMPLATE = 'tracker-section'
 
-    def __init__(self, *, api_token, project_id, **kwargs):
-        super().__init__(api_token=api_token, **kwargs)
+    def __init__(self, *, project_id, **kwargs):
+        super().__init__(**kwargs)
         self.current_iteration = 0
         self.project_id = project_id
         self.project_version = 0

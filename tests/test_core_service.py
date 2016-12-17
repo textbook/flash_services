@@ -8,10 +8,9 @@ from flash_services.core import Service
 
 class Test(Service):
 
-    REQUIRED = {'foo', 'bar'}
     ROOT = 'root/url'
 
-    def __init__(self):
+    def __init__(self, *, foo, bar):
         super().__init__()
 
     def update(self):
@@ -50,7 +49,7 @@ def test_required_config(config):
     ),
 ])
 def test_url_builder(args, kwargs, expected):
-    assert Test().url_builder(*args, **kwargs) == expected
+    assert Test(foo=None, bar=None).url_builder(*args, **kwargs) == expected
 
 
 def test_calculate_timeout_delta_seconds():

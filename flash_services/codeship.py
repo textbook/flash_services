@@ -29,11 +29,10 @@ class Codeship(UrlParamMixin, ContinuousIntegrationService):
         'success': 'passed',
         'testing': 'working',
     }
-    REQUIRED = {'project_id'}
     ROOT = 'https://codeship.com/api/v1'
 
-    def __init__(self, *, api_token, project_id, **kwargs):
-        super().__init__(api_token=api_token, **kwargs)
+    def __init__(self, *, project_id, **kwargs):
+        super().__init__(**kwargs)
         self.project_id = project_id
 
     def update(self):

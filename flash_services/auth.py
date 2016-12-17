@@ -4,15 +4,19 @@
 from base64 import b64encode
 from collections import OrderedDict
 
+from .core import MixinMeta
 
-class Unauthenticated:
+
+class AuthMixin(metaclass=MixinMeta):
+    """Root class for all authentication mix-ins."""
+
+
+class Unauthenticated(AuthMixin):
     """No-op mix-in class for unauthenticated services."""
 
 
-class TokenAuthMixin:
+class TokenAuthMixin(AuthMixin):
     """Mix-in class for implementing token authentication."""
-
-    REQUIRED = {'api_token'}
 
     TOKEN_ENV_VAR = None
     """:py:class:`str`: The environment variable holding the token."""
@@ -55,10 +59,8 @@ class HeaderMixin(TokenAuthMixin):
         return headers
 
 
-class BasicAuthHeaderMixin:
+class BasicAuthHeaderMixin(AuthMixin):
     """Mix-in class for HTTP Basic auth."""
-
-    REQUIRED = {'username', 'password'}
 
     def __init__(self, *, username, password, **kwargs):
         self.username = username

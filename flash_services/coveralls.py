@@ -34,7 +34,6 @@ class Coveralls(Unauthenticated, ThresholdMixin, Service):
     FRIENDLY_NAME = 'Coveralls'
     NEUTRAL_THRESHOLD = 50
     OK_THRESHOLD = 80
-    REQUIRED = {'vcs_name', 'account', 'repo'}
     ROOT = 'https://coveralls.io'
     TEMPLATE = 'coveralls-section'
 

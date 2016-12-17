@@ -8,13 +8,13 @@ from urllib.parse import urlencode
 
 from dateutil.parser import parse
 
-from .utils import remove_tags
+from .utils import remove_tags, required_args
 
 logger = logging.getLogger(__name__)
 
 
-class MetaService(ABCMeta):
-    """Metaclass to simplify configuration."""
+class MixinMeta(type):
+    """Metaclass for all mix-ins."""
 
     def __new__(mcs, name, bases, attrs):
         """Update the new class with appropriate attributes.
@@ -31,18 +31,38 @@ class MetaService(ABCMeta):
         Note:
           The ``REQUIRED`` configuration of each class is the union of
           the required configuration keys of all of its base classes.
+
+        """
+        base_required = [required_args(base.__dict__) for base in bases]
+        attrs['REQUIRED'] = set.union(required_args(attrs), *base_required)
+        return super().__new__(mcs, name, bases, attrs)
+
+
+class ServiceMeta(ABCMeta, MixinMeta):
+    """Metaclass to simplify configuration."""
+
+    def __new__(mcs, name, bases, attrs):
+        """Update the new class with appropriate attributes.
+
+        Arguments:
+          mcs (:py:class:`type`): The newly-created class.
+          name (:py:class:`str`): The name of the class.
+          bases (:py:class:`tuple`): The base classes of the class.
+          attrs (:py:class:`dict`): The attributes of the class.
+
+        Returns:
+          :py:class:`type`: The class, updated.
+
+        Note:
           The ``FRIENDLY_NAME`` defaults to ``name`` if not explicitly
           provided.
 
         """
-        attrs['REQUIRED'] = attrs.get('REQUIRED', set()).union(
-            *(getattr(base, 'REQUIRED', set()) for base in bases)
-        )
         attrs['FRIENDLY_NAME'] = attrs.get('FRIENDLY_NAME', name)
         return super().__new__(mcs, name, bases, attrs)
 
 
-class Service(metaclass=MetaService):
+class Service(metaclass=ServiceMeta):
     """Abstract base class for services."""
 
     FRIENDLY_NAME = None
@@ -58,7 +78,7 @@ class Service(metaclass=MetaService):
     """:py:class:`str`: The name of the template to render."""
 
     @abstractmethod
-    def __init__(self, *_, **kwargs):
+    def __init__(self, **kwargs):
         self.service_name = kwargs.get('name')
 
     @abstractmethod
@@ -171,10 +191,9 @@ class VersionControlService(Service):
         )
 
 
-class CustomRootMixin:
+class CustomRootMixin(metaclass=MixinMeta):
     """Mix-in class for implementing custom service roots."""
 
-    REQUIRED = {'root'}
     ROOT = ''
 
     def __init__(self, *, root, **kwargs):
@@ -188,7 +207,7 @@ class CustomRootMixin:
                                    url_params=url_params)
 
 
-class ThresholdMixin:
+class ThresholdMixin(metaclass=MixinMeta):
     """Mix-in class for defining health thresholds.
 
     Attributes:
@@ -202,10 +221,11 @@ class ThresholdMixin:
     NEUTRAL_THRESHOLD = None
     OK_THRESHOLD = None
 
-    def __init__(self, **kwargs):
+    def __init__(self, *, ok_threshold=None, neutral_threshold=None, **kwargs):
         super().__init__(**kwargs)
-        self.ok_threshold = int(kwargs.get('ok_threshold', self.OK_THRESHOLD))
-        self.neutral_threshold = int(kwargs.get(
-            'neutral_threshold',
-            self.NEUTRAL_THRESHOLD
-        ))
+        if ok_threshold is None:
+            ok_threshold = self.OK_THRESHOLD
+        if neutral_threshold is None:
+            neutral_threshold = self.NEUTRAL_THRESHOLD
+        self.ok_threshold = ok_threshold
+        self.neutral_threshold = neutral_threshold

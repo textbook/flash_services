@@ -31,11 +31,10 @@ class GitHub(UrlParamMixin, VersionControlService):
     """
 
     AUTH_PARAM = 'access_token'
-    REQUIRED = {'account', 'repo'}
     ROOT = 'https://api.github.com'
 
-    def __init__(self, *, api_token, account, repo, branch=None, **kwargs):
-        super().__init__(api_token=api_token, **kwargs)
+    def __init__(self, *, account, repo, branch=None, **kwargs):
+        super().__init__(**kwargs)
         self.account = account
         self.repo = repo
         self.branch = branch
@@ -122,9 +121,8 @@ class GitHubIssues(ThresholdMixin, GitHub):
     OK_THRESHOLD = 7
     TEMPLATE = 'gh-issues-section'
 
-    def __init__(self, *, api_token, account, repo, **kwargs):
-        super().__init__(account=account, api_token=api_token, repo=repo,
-                         **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.branch = None  # branches aren't relevant for issues
 
     def update(self):

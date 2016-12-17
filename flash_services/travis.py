@@ -33,7 +33,6 @@ class TravisOS(ContinuousIntegrationService):
         'started': 'working',
         'errored': 'crashed',
     }
-    REQUIRED = {'account', 'app'}
     ROOT = 'https://api.travis-ci.org'
 
     def __init__(self, *, account, app, **kwargs):

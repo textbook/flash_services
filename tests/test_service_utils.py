@@ -4,7 +4,8 @@ from unittest import mock
 import pytest
 
 from flash_services.utils import (elapsed_time, estimate_time, friendlier,
-                                  health_summary, occurred, remove_tags)
+                                  health_summary, occurred, required_args,
+                                  remove_tags)
 
 TWO_DAYS_AGO = datetime.now() - timedelta(days=2, hours=12)
 
@@ -135,3 +136,14 @@ def test_build_estimate_not_first():
 ])
 def test_remove_tags(message, expected):
     assert remove_tags(message) == expected
+
+
+@pytest.mark.parametrize('attrs, expected', [
+    ({}, set()),
+    ({'__init__': lambda self, *, foo, bar: None}, {'foo', 'bar'}),
+    ({'__init__': lambda self, *, foo, bar=None: None}, {'foo'}),
+    ({'REQUIRED': {'baz'}}, {'baz'}),
+    ({'REQUIRED': {'baz'}, '__init__': lambda self, *, foo: None}, {'foo', 'baz'}),
+])
+def test_required_args(attrs, expected):
+    assert required_args(attrs) == expected

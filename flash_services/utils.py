@@ -1,6 +1,7 @@
 """Useful utility functions for services."""
 
 from datetime import datetime, timezone
+from inspect import Parameter, Signature
 import logging
 import re
 
@@ -239,3 +240,27 @@ def remove_tags(commit_message):
     for remove in [GITHUB_ISSUE, TRACKER_STORY]:
         commit_message = remove.sub('', commit_message)
     return commit_message.strip()
+
+
+def required_args(attrs):
+    """Extract the required arguments from a class's attrs.
+
+    Arguments:
+      attrs (:py:class:`dict`) :The attributes of a class.
+
+    Returns:
+      :py:class:`set`: The required arguments.
+
+    """
+    init_args = attr_args = set()
+    if '__init__' in attrs:
+        sig = Signature.from_callable(attrs['__init__'])
+        init_args = set(
+            name
+            for name, param in sig.parameters.items()
+            if param.kind == Parameter.KEYWORD_ONLY
+            and param.default is Signature.empty
+        )
+    if 'REQUIRED' in attrs:
+        attr_args = attrs['REQUIRED']
+    return set.union(attr_args, init_args)
