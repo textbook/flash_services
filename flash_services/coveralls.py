@@ -45,6 +45,7 @@ class Coveralls(Unauthenticated, ThresholdMixin, Service):
 
     @property
     def repo_name(self):
+        """A neatly-formatted version of the name of the repo."""
         return '/'.join([self.vcs_name, self.account, self.repo])
 
     def update(self):
@@ -82,6 +83,15 @@ class Coveralls(Unauthenticated, ThresholdMixin, Service):
         )
 
     def health(self, last_build):
+        """Determine the health of the last build.
+
+        Arguments:
+          last_build (:py:class:`dict`): The last build.
+
+        Returns:
+          :py:class:`str`: The health rating.
+
+        """
         if last_build is None:
             return 'error'
         coverage = last_build['raw_coverage']

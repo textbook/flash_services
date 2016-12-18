@@ -163,6 +163,15 @@ class ContinuousIntegrationService(Service):
     @classmethod
     @abstractmethod
     def format_build(cls, build):
+        """Re-format the build data for the front-end.
+
+        Arguments:
+          build (:py:class:`dict`): The JSON data from the response.
+
+        Returns:
+          :py:class:`dict`: The re-formatted data.
+
+        """
         outcome = build.get('outcome')
         if outcome not in cls.OUTCOMES:
             logger.warning('unknown outcome: %s', outcome)
@@ -184,6 +193,15 @@ class VersionControlService(Service):
     @classmethod
     @abstractmethod
     def format_commit(cls, commit):
+        """Format the raw commit from the service.
+
+        Arguments:
+          commit (:py:class:`dict`): The raw commit from the service.
+
+        Returns:
+          :py:class:`dict`): The formatted commit.
+
+        """
         return dict(
             author=commit.get('author') or '<no author>',
             committed=commit.get('committed'),
@@ -201,6 +219,21 @@ class CustomRootMixin(metaclass=MixinMeta):
         self.root = root
 
     def url_builder(self, endpoint, *, root=None, params=None, url_params=None):
+        """Create a URL for the specified endpoint.
+
+        Arguments:
+          endpoint (:py:class:`str`): The API endpoint to access.
+          root: (:py:class:`str`, optional): The root URL for the
+            service API.
+          params: (:py:class:`dict`, optional): The values for format
+            into the created URL (defaults to ``None``).
+          url_params: (:py:class:`dict`, optional): Parameters to add
+            to the end of the URL (defaults to ``None``).
+
+        Returns:
+          :py:class:`str`: The resulting URL.
+
+        """
         if root is None:
             root = self.root
         return super().url_builder(endpoint=endpoint, root=root, params=params,

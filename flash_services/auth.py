@@ -69,6 +69,7 @@ class BasicAuthHeaderMixin(AuthMixin):
 
     @property
     def headers(self):
+        """Get the headers for the service requests."""
         encoding = 'utf8'
         headers = super().headers
         token = b64encode(bytes('{}:{}'.format(

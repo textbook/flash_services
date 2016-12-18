@@ -48,8 +48,9 @@ def friendlier(func):
             return result
     return wrapper
 
-naturaldelta = friendlier(naturaldelta)
-naturaltime = friendlier(naturaltime)
+
+naturaldelta = friendlier(naturaldelta)  # pylint: disable=invalid-name
+naturaltime = friendlier(naturaltime)  # pylint: disable=invalid-name
 
 
 def elapsed_time(start, end):
