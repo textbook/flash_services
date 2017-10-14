@@ -1,12 +1,17 @@
 <section class="pane coveralls-pane">
-  {% for _ in range(4) %}
+  {% for i in range(4) %}
+    {% if service_data['builds'] | length > i %}
+      {% set commit_data = service_data['builds'][i] %}
+    {% else %}
+      {% set commit_data = {} %}
+    {% endif %}
     <div class="pane-item coverage">
       <div class="message">
-        <span class="coverage"></span>
-        <span class="message"></span>
+        <span class="coverage">{{ commit_data.coverage }}</span>
+        <span class="message_text">{{ commit_data.message_text }}</span>
       </div>
-      <div class="committed"></div>
-      <div class="author"></div>
+      <div class="committed">{{ commit_data.committed }}</div>
+      <div class="author">{{ commit_data.author }}</div>
     </div>
   {% endfor %}
 </section>

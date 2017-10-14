@@ -73,6 +73,7 @@ setup(
     package_data={PKG_NAME: ['templates/**/*.html', 'static/**/*.js']},
     platforms='any',
     tests_require=[
+        'beautifulsoup4',
         'pylint',
         'pytest',
         'pytest-pylint',

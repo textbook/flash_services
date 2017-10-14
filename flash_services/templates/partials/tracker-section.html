@@ -1,12 +1,12 @@
 <section class="pane short-pane tracker-pane">
   <div class="pane-item">
     <span class="item-title">Velocity: </span>
-    <span class="velocity"></span>
+    <span class="count velocity">{{ service_data.velocity }}</span>
   </div>
   {% for category in ['ready', 'in-flight', 'completed', 'accepted'] %}
     <div class="pane-item">
       <span class="item-title">{{ category | capitalize | replace('-', ' ') }}: </span>
-      <span class="{{ category }}"></span>
+      <span class="count {{ category }}">{{ service_data.stories[category] or 0 }}</span>
     </div>
   {% endfor %}
 </section>

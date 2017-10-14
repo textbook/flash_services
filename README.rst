@@ -13,10 +13,6 @@ Flash Services
   :target: https://coveralls.io/github/textbook/flash_services?branch=master
   :alt: Test Coverage
 
-.. image:: https://www.quantifiedcode.com/api/v1/project/9f4a57999d474c9db7210dd9e576ac6a/badge.svg
-  :target: https://www.quantifiedcode.com/app/project/9f4a57999d474c9db7210dd9e576ac6a
-  :alt: Code Issues
-
 .. image:: https://api.codacy.com/project/badge/grade/c20159586c524b108e17609d11a88688
   :target: https://www.codacy.com/app/j-r-sharpe-github/flash_services
   :alt: Other Code Issues
@@ -138,14 +134,21 @@ validation are supported).
 
 * Create a new ``Service`` subclass, or use one of the pre-provided
   subclasses for continuous integration or version control systems;
+
 * Use the mix-ins from ``auth.py`` and ``core.py`` to add any required
   authentication, custom root setting and/or health thresholds;
+
 * Define any additional ``REQUIRED`` configuration parameters on the class
   (required parameters from its superclasses will be added automatically);
+
 * Set the appropriate ``TEMPLATE`` for it (if not a standard template, add it
-  to ``templates/partials`` - use the `Jinja2`_ templating language);
+  to ``templates/partials`` - use the `Jinja2`_ templating language), and note
+  that the service data will be exposed to the template as ``service_data``
+  for the initial load data binding and for clients without JavaScript;
+
 * Set the ``FRIENDLY_NAME``, for display in the top-left of each pane, if not
   the same as the class name;
+
 * Register the service in **both** ``SERVICES`` objects, using the same key:
 
   * in Python (``__init__.py``); and

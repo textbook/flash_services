@@ -1,22 +1,23 @@
 <section class="pane short-pane gh_issues-pane">
+  {% set issues = service_data.issues %}
   <div class="pane-item">
     <span class="item-title">Open issues: </span>
-    <span class="open-issues"></span>
+    <span class="count open-issues">{{ issues['open-issues'] }}</span>
   </div>
   <div class="pane-item">
     <span class="item-title">Closed issues: </span>
-    <span class="closed-issues"></span>
+    <span class="count closed-issues">{{ issues['closed-issues'] }}</span>
   </div>
   <div class="pane-item">
     <span class="item-title">Open PRs: </span>
-    <span class="open-pull-requests"></span>
+    <span class="count open-pull-requests">{{ issues['open-pull-requests'] }}</span>
   </div>
   <div class="pane-item">
     <span class="item-title">Closed PRs: </span>
-    <span class="closed-pull-requests"></span>
+    <span class="count closed-pull-requests">{{ issues['closed-pull-requests'] }}</span>
   </div>
   <div class="pane-item">
     <span class="item-title">&lambda;: </span>
-    <span class="half-life"></span>
+    <span class="count half-life">{{ service_data.halflife or 'N/A' }}</span>
   </div>
 </section>
