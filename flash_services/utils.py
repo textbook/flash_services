@@ -125,7 +125,7 @@ def occurred(at_):
     """
     try:
         occurred_at = parse(at_)
-    except (AttributeError, ValueError):
+    except (TypeError, ValueError):
         logger.warning('failed to parse occurrence time %r', at_)
         return 'time not available'
     utc_now = datetime.now(tz=timezone.utc)

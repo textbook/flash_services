@@ -6,7 +6,7 @@ import pytest
 from flash_services.core import Service
 
 
-class Test(Service):
+class Fake(Service):
 
     ROOT = 'root/url'
 
@@ -24,10 +24,10 @@ class Test(Service):
 ])
 def test_required_config(config):
     with pytest.raises(TypeError) as excinfo:
-        Test.from_config(**config)
+        Fake.from_config(**config)
     message = excinfo.value.args[0]
     assert 'missing required config keys' in message
-    assert 'from Test' in message
+    assert 'from Fake' in message
 
 
 @pytest.mark.parametrize('args, kwargs, expected', [
@@ -49,7 +49,7 @@ def test_required_config(config):
     ),
 ])
 def test_url_builder(args, kwargs, expected):
-    assert Test(foo=None, bar=None).url_builder(*args, **kwargs) == expected
+    assert Fake(foo=None, bar=None).url_builder(*args, **kwargs) == expected
 
 
 def test_calculate_timeout_delta_seconds():

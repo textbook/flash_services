@@ -65,7 +65,7 @@ setup(
     ],
     cmdclass={'test': PyTest},
     description=description,
-    install_requires=['Flask', 'python-dateutil', 'requests'],
+    install_requires=['Flask', 'humanize', 'python-dateutil', 'requests'],
     license='License :: OSI Approved :: ISC License (ISCL)',
     long_description=long_description,
     name=PKG_NAME,
