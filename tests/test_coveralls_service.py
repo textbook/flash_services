@@ -4,10 +4,12 @@ from unittest import mock
 import pytest
 from datetime import timedelta
 
+import responses
+
 from flash_services.coveralls import Coveralls
 
 
-@pytest.fixture()
+@pytest.fixture
 def service():
     return Coveralls(vcs_name='foo', account='bar', repo='baz')
 
@@ -16,33 +18,28 @@ def test_repo_name(service):
     assert service.repo_name == 'foo/bar/baz'
 
 
-@mock.patch.object(Coveralls, 'health')
-@mock.patch.object(Coveralls, 'format_build')
-def test_format_data(format_build, health, service):
-    result = service.format_data('foo', dict(builds=['bar']))
-
-    format_build.assert_called_once_with('bar')
-    health.assert_called_once_with(format_build.return_value)
-    assert result == dict(
-        name='foo',
-        builds=[format_build.return_value],
-        health=health.return_value,
+@pytest.mark.parametrize('build, outcome', [
+    (dict(covered_percent=100), 'ok'),
+    (dict(covered_percent=85), 'ok'),
+    (dict(covered_percent=80), 'ok'),
+    (dict(covered_percent=75), 'neutral'),
+    (dict(covered_percent=55), 'neutral'),
+    (dict(covered_percent=50), 'neutral'),
+    (dict(covered_percent=45), 'error'),
+    (dict(covered_percent=None), 'error'),
+    (dict(), 'error'),
+])
+@responses.activate
+def test_health(build, outcome, service):
+    responses.add(
+        responses.GET,
+        'https://coveralls.io/foo/bar/baz.json?page=1',
+        json=dict(builds=[build])
     )
 
+    result = service.update()
 
-@pytest.mark.parametrize('build, outcome', [
-    (dict(raw_coverage=100), 'ok'),
-    (dict(raw_coverage=85), 'ok'),
-    (dict(raw_coverage=80), 'ok'),
-    (dict(raw_coverage=75), 'neutral'),
-    (dict(raw_coverage=55), 'neutral'),
-    (dict(raw_coverage=50), 'neutral'),
-    (dict(raw_coverage=45), 'error'),
-    (dict(raw_coverage=None), 'error'),
-    (None, 'error'),
-])
-def test_health(build, outcome, service):
-    assert service.health(build) == outcome
+    assert result['health'] == outcome
 
 
 TWO_DAYS_AGO = (datetime.now() - timedelta(days=2, hours=12)).strftime(
@@ -50,38 +47,23 @@ TWO_DAYS_AGO = (datetime.now() - timedelta(days=2, hours=12)).strftime(
 )
 
 
-def test_format_build(service):
-    result = service.format_build(dict(
-        commit_message='some dummy text',
-        committer_name='Test Author',
-        covered_percent=90,
-        created_at=TWO_DAYS_AGO,
-    ))
-
-    assert result == dict(
-        author='Test Author',
-        committed='two days ago',
-        coverage='90.0%',
-        message_text='some dummy text',
-        raw_coverage=90,
+@responses.activate
+def test_update(service):
+    responses.add(
+        responses.GET,
+        'https://coveralls.io/foo/bar/baz.json?page=1',
+        json=dict(
+            builds=[dict(
+                commit_message='[#123456] some message',
+                committer_name='Dummy User',
+                covered_percent=80,
+                created_at=TWO_DAYS_AGO,
+            )],
+        )
     )
 
-
-@mock.patch('flash_services.coveralls.requests.get', **{
-    'return_value.status_code': 200,
-    'return_value.json.return_value': dict(
-        builds=[dict(
-            commit_message='[#123456] some message',
-            committer_name='Dummy User',
-            covered_percent=80,
-            created_at=TWO_DAYS_AGO,
-        )],
-    ),
-})
-def test_update(get, service):
     result = service.update()
 
-    get.expect_called_once_with('https://coveralls.io/foo/bar/baz.json?page=1')
     assert result == dict(
         builds=[dict(
             author='Dummy User',
@@ -95,13 +77,35 @@ def test_update(get, service):
     )
 
 
+@responses.activate
 def test_format_build_missing_data(service):
-    result = service.format_build({})
+    responses.add(
+        responses.GET,
+        'https://coveralls.io/foo/bar/baz.json?page=1',
+        json=dict(builds=[{}]),
+    )
 
-    assert result == dict(
+    result = service.update()
+
+    assert result['builds'][0] == dict(
         author='<no author>',
         committed='time not available',
         coverage=None,
         message_text=None,
         raw_coverage=None,
     )
+
+
+@mock.patch('flash_services.coveralls.logger.error')
+@responses.activate
+def test_update_failure(error, service):
+    responses.add(
+        responses.GET,
+        'https://coveralls.io/foo/bar/baz.json?page=1',
+        status=401,
+    )
+
+    result = service.update()
+
+    error.assert_called_once_with('failed to update Coveralls project data')
+    assert result == {}

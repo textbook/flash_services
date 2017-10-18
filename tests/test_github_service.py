@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from unittest import mock
 
 import pytest
+import responses
 
 from flash_services.core import Service
 from flash_services.github import GitHub, GitHubEnterprise
@@ -43,72 +44,72 @@ TWO_DAYS_AGO = (datetime.now() - timedelta(days=2, hours=12)).strftime(
 
 
 @mock.patch('flash_services.github.logger.debug')
-@mock.patch('flash_services.github.requests.get', **{
-    'return_value.status_code': 200,
-    'return_value.json.return_value': [{'commit': {
-        'author': {'name': 'alice'},
-        'committer': {'name': 'bob', 'date': TWO_DAYS_AGO},
-        'message': 'commit message',
-    }}],
-})
-def test_update_success(get, debug, service):
+@responses.activate
+def test_update_success(debug, service):
+    responses.add(
+        responses.GET,
+        'https://api.github.com/repos/foo/bar/commits?access_token=foobar',
+        json=[{'commit': {
+            'author': {'name': 'alice'},
+            'committer': {'name': 'bob', 'date': TWO_DAYS_AGO},
+            'message': 'commit message',
+        }}],
+    )
+
     result = service.update()
 
-    get.assert_called_once_with(
-        'https://api.github.com/repos/foo/bar/commits?access_token=foobar',
-        headers={'User-Agent': 'bar'}
-    )
     debug.assert_called_once_with('fetching GitHub project data')
     assert result == {'commits': [{
         'message': 'commit message',
         'author': 'alice [bob]',
         'committed': 'two days ago'
     }], 'name': 'foo/bar'}
-
+    assert responses.calls[0].request.headers['User-Agent'] == 'bar'
 
 @mock.patch('flash_services.github.logger.debug')
-@mock.patch('flash_services.github.requests.get', **{
-    'return_value.status_code': 200,
-    'return_value.json.return_value': [{'commit': {
-        'author': {'name': 'alice'},
-        'committer': {'name': 'bob', 'date': TWO_DAYS_AGO},
-        'message': 'commit message',
-    }}],
-})
-def test_update_enterprise_success(get, debug):
+@responses.activate
+def test_update_enterprise_success(debug):
+    responses.add(
+        responses.GET,
+        'http://dummy.url/repos/foo/bar/commits?access_token=foobar',
+        json=[{'commit': {
+            'author': {'name': 'alice'},
+            'committer': {'name': 'bob', 'date': TWO_DAYS_AGO},
+            'message': 'commit message',
+        }}],
+    )
+
     service = GitHubEnterprise(api_token='foobar', account='foo', repo='bar',
                                root='http://dummy.url')
 
     result = service.update()
 
-    get.assert_called_once_with(
-        'http://dummy.url/repos/foo/bar/commits?access_token=foobar',
-        headers={'User-Agent': 'bar'}
-    )
     debug.assert_called_once_with('fetching GitHub project data')
     assert result == {'commits': [{
         'message': 'commit message',
         'author': 'alice [bob]',
         'committed': 'two days ago'
     }], 'name': 'foo/bar'}
+    assert responses.calls[0].request.headers['User-Agent'] == 'bar'
 
 
 @mock.patch('flash_services.github.logger.error')
-@mock.patch('flash_services.github.requests.get', **{
-    'return_value.status_code': 401,
-})
-def test_update_failure(get, error, service):
+@responses.activate
+def test_update_failure(error, service):
+    responses.add(
+        responses.GET,
+        'https://api.github.com/repos/foo/bar/commits?access_token=foobar',
+        status=401,
+    )
+
     result = service.update()
 
-    get.assert_called_once_with(
-        'https://api.github.com/repos/foo/bar/commits?access_token=foobar',
-        headers={'User-Agent': 'bar'}
-    )
     error.assert_called_once_with('failed to update GitHub project data')
     assert result == {}
+    assert responses.calls[0].request.headers['User-Agent'] == 'bar'
 
 
-@pytest.mark.parametrize('input_, expected', [
+@pytest.mark.parametrize('commit, expected', [
     (dict(), dict(author='<no author>', committed='time not available', message='')),
     (
         dict(
@@ -139,18 +140,28 @@ def test_update_failure(get, error, service):
         ),
     ),
 ])
-def test_format_commit(input_, expected):
-    assert GitHub.format_commit(input_) == expected
+@responses.activate
+def test_format_commit(service, commit, expected):
+    responses.add(
+        responses.GET,
+        'https://api.github.com/repos/foo/bar/commits?access_token=foobar',
+        json=[dict(commit=commit)],
+    )
+
+    result = service.update()
+
+    assert result['commits'][0] == expected
+    assert responses.calls[0].request.headers['User-Agent'] == 'bar'
 
 
-@mock.patch('flash_services.github.requests.get', **{
-    'return_value.status_code': 302,
-})
-def test_branch_url(get, branched):
+@responses.activate
+def test_branch_url(branched):
+    responses.add(
+        responses.GET,
+        'https://api.github.com/repos/foo/bar/commits?sha=baz&access_token=foobar',
+        status=302,
+    )
+
     branched.update()
 
-    get.assert_called_once_with(
-        'https://api.github.com/repos/foo/bar/commits'
-        '?sha=baz&access_token=foobar',
-        headers={'User-Agent': 'bar'},
-    )
+    assert responses.calls[0].request.headers['User-Agent'] == 'bar'

@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+import responses
 
 from flash_services.core import Service
 from flash_services.github import GitHubEnterpriseIssues, GitHubIssues
@@ -32,106 +33,127 @@ def test_correct_enterprise_config():
 
 
 @mock.patch('flash_services.github.logger.debug')
-@mock.patch('flash_services.github.requests.get', **{
-    'return_value.status_code': 200,
-    'return_value.json.return_value': [],
-})
-def test_update_success(get, debug, service):
+@responses.activate
+def test_update_success(debug, service):
+    responses.add(
+        responses.GET,
+        'https://api.github.com/repos/foo/bar/issues?state=all&access_token=foobar',
+        headers={'User-Agent': 'bar'},
+        json=[],
+    )
+
     result = service.update()
 
-    get.assert_called_once_with(
-        'https://api.github.com/repos/foo/bar/issues?state=all&access_token=foobar',
-        headers={'User-Agent': 'bar'}
-    )
     debug.assert_called_once_with('fetching GitHub issue data')
     assert result == {'issues': {}, 'name': 'foo/bar', 'health': 'neutral', 'halflife': None}
 
 
 @mock.patch('flash_services.github.logger.debug')
-@mock.patch('flash_services.github.requests.get', **{
-    'return_value.status_code': 200,
-    'return_value.json.return_value': [],
-})
-def test_update_enterprise_success(get, debug):
-    service = GitHubEnterpriseIssues(api_token='foobar', account='foo',
-                                     repo='bar', root='http://dummy.url')
+@responses.activate
+def test_update_enterprise_success(debug):
+    responses.add(
+        responses.GET,
+        'http://dummy.url/repos/foo/bar/issues?state=all&access_token=foobar',
+        headers={'User-Agent': 'bar'},
+        json=[],
+    )
+    service = GitHubEnterpriseIssues(
+        api_token='foobar',
+        account='foo',
+        repo='bar',
+        root='http://dummy.url',
+    )
 
     result = service.update()
 
-    get.assert_called_once_with(
-        'http://dummy.url/repos/foo/bar/issues?state=all&access_token=foobar',
-        headers={'User-Agent': 'bar'}
-    )
     debug.assert_called_once_with('fetching GitHub issue data')
     assert result == {'issues': {}, 'name': 'foo/bar', 'health': 'neutral', 'halflife': None}
 
 
 @mock.patch('flash_services.github.logger.error')
-@mock.patch('flash_services.github.requests.get', **{
-    'return_value.status_code': 401,
-})
-def test_update_failure(get, error, service):
+@responses.activate
+def test_update_failure(error, service):
+    responses.add(
+        responses.GET,
+        'https://api.github.com/repos/foo/bar/issues?state=all&access_token=foobar',
+        headers={'User-Agent': 'bar'},
+        status=401,
+
+    )
+
     result = service.update()
 
-    get.assert_called_once_with(
-        'https://api.github.com/repos/foo/bar/issues?state=all&access_token=foobar',
-        headers={'User-Agent': 'bar'}
-    )
     error.assert_called_once_with('failed to update GitHub issue data')
     assert result == {}
 
 
-@pytest.mark.parametrize('input_, expected', [
-    (('hello', []), dict(name='hello', issues={}, health='neutral', halflife=None)),
+@pytest.mark.parametrize('payload, expected', [
+    ([], dict(name='foo/bar', issues={}, health='neutral', halflife=None)),
     (
-        ('hello', [{'state': 'open'}, {'state': 'open'}]),
-        dict(name='hello', issues={'open-issues': 2}, health='neutral', halflife=None),
+        [{'state': 'open'}, {'state': 'open'}],
+        dict(name='foo/bar', issues={'open-issues': 2}, health='neutral',
+             halflife=None),
     ),
     (
-        ('hello', [{'state': 'open'}, {'state': 'closed'}]),
-        dict(name='hello', issues={'open-issues': 1, 'closed-issues': 1}, health='neutral', halflife=None),
+        [{'state': 'open'}, {'state': 'closed'}],
+        dict(name='foo/bar', issues={'open-issues': 1, 'closed-issues': 1},
+             health='neutral', halflife=None),
     ),
     (
-        ('hello', [{'state': 'open'}, {'state': 'open', 'pull_request': {}}]),
-        dict(name='hello', issues={'open-issues': 1, 'open-pull-requests': 1}, health='neutral', halflife=None),
+        [{'state': 'open'}, {'state': 'open', 'pull_request': {}}],
+        dict(name='foo/bar', issues={'open-issues': 1, 'open-pull-requests':
+            1},
+             health='neutral', halflife=None),
     ),
     (
-        ('hello', [{'state': 'closed', 'created_at': '2010/11/12', 'closed_at': '2010/11/14'}]),
-        dict(name='hello', issues={'closed-issues': 1}, health='ok', halflife='two days'),
+        [{'state': 'closed', 'created_at': '2010/11/12', 'closed_at': '2010/11/14'}],
+        dict(name='foo/bar', issues={'closed-issues': 1}, health='ok',
+             halflife='two days'),
     ),
     (
-        ('hello', [{'state': 'closed', 'created_at': '2010/11/12', 'closed_at': '2010/11/22'}]),
-        dict(name='hello', issues={'closed-issues': 1}, health='neutral', halflife='ten days'),
+        [{'state': 'closed', 'created_at': '2010/11/12', 'closed_at': '2010/11/22'}],
+        dict(name='foo/bar', issues={'closed-issues': 1}, health='neutral',
+             halflife='ten days'),
     ),
     (
-        ('hello', [{'state': 'closed', 'created_at': '2010/10/12', 'closed_at': '2010/11/14'}]),
-        dict(name='hello', issues={'closed-issues': 1}, health='error', halflife='a month'),
+        [{'state': 'closed', 'created_at': '2010/10/12', 'closed_at': '2010/11/14'}],
+        dict(name='foo/bar', issues={'closed-issues': 1}, health='error',
+             halflife='a month'),
     ),
     (
-        ('hello', [
+        [
             {'state': 'closed', 'created_at': '2010/10/12', 'closed_at': '2010/10/15'},
             {'state': 'closed', 'created_at': '2010/10/12', 'closed_at': '2010/10/16'},
             {'state': 'open', 'created_at': '2010/10/12', 'closed_at': None},
-        ]),
-        dict(name='hello', issues={'closed-issues': 2, 'open-issues': 1}, health='ok', halflife='three days'),
+        ],
+        dict(name='foo/bar', issues={'closed-issues': 2, 'open-issues': 1},
+             health='ok', halflife='three days'),
     ),
     (
-        ('hello', [
+        [
             {'state': 'closed', 'created_at': '2010/10/12', 'closed_at': '2010/10/15'},
             {'state': 'closed', 'created_at': '2010/10/12', 'closed_at': '2010/10/16', 'pull_request': {}},
             {'state': 'closed', 'created_at': '2010/10/12', 'closed_at': '2010/10/17'},
             {'state': 'open', 'created_at': '2010/10/12', 'closed_at': None},
-        ]),
+        ],
         dict(
-            name='hello',
+            name='foo/bar',
             issues={'closed-issues': 2, 'closed-pull-requests': 1, 'open-issues': 1},
             health='ok',
             halflife='four days',
         ),
     ),
 ])
-def test_format_data(input_, expected, service):
-    assert service.format_data(*input_) == expected
+@responses.activate
+def test_format_data(payload, expected, service):
+    responses.add(
+        responses.GET,
+        'https://api.github.com/repos/foo/bar/issues?state=all&access_token=foobar',
+        json=payload,
+    )
+
+    assert service.update() == expected
+    assert responses.calls[0].request.headers['User-Agent'] == 'bar'
 
 
 def test_adjust_threshold():

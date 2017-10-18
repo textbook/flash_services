@@ -2,9 +2,14 @@ from datetime import datetime
 from unittest import mock
 from urllib.parse import quote_plus
 
+from freezegun import freeze_time
 import pytest
+import responses
 
 from flash_services import Jenkins, SERVICES
+
+ROOT = 'https://test.org'
+JOB = 'baz'
 
 
 @pytest.fixture
@@ -12,8 +17,17 @@ def service():
     return SERVICES['jenkins'](
         username='foo',
         password='bar',
-        root='https://test.org',
-        job='baz',
+        root=ROOT,
+        job=JOB,
+    )
+
+
+@pytest.fixture
+def url():
+    return '{}/job/{}/api/json?tree={}'.format(
+        ROOT,
+        JOB,
+        quote_plus(Jenkins.TREE_PARAMS),
     )
 
 
@@ -23,38 +37,36 @@ def test_correct_config():
 
 
 @mock.patch('flash_services.jenkins.logger.debug')
-@mock.patch('flash_services.jenkins.requests.get', **{
-    'return_value.status_code': 200,
-    'return_value.json.return_value': {'builds': [], 'name': 'baz'},
-})
-def test_update_success(get, debug, service):
+@responses.activate
+def test_update_success(debug, service, url):
+    responses.add(
+        responses.GET,
+        url,
+        headers={'Authorization': 'Basic Zm9vOmJhcg=='},
+        json={'builds': [], 'name': 'baz'},
+    )
+
     result = service.update()
 
-    get.assert_called_once_with(
-        'https://test.org/job/baz/api/json?tree={}'.format(
-            quote_plus(Jenkins.TREE_PARAMS)
-        ),
-        headers={'Authorization': 'Basic Zm9vOmJhcg=='}
-    )
     debug.assert_called_once_with('fetching Jenkins project data')
     assert result == {'builds': [], 'name': 'baz', 'health': 'neutral'}
 
 
 @mock.patch('flash_services.jenkins.logger.error')
-@mock.patch('flash_services.jenkins.requests.get', **{
-    'return_value.status_code': 401,
-})
-def test_update_failure(_, error, service):
+@responses.activate
+def test_update_failure(error, service, url):
+    responses.add(responses.GET, url, status=401)
+
     result = service.update()
 
     error.assert_called_once_with('failed to update Jenkins project data')
     assert result == {}
 
 
-def test_formatting():
-    response = dict(
-        name='job',
-        builds=[dict(
+@responses.activate
+def test_formatting(service, url):
+    response = dict(name='job', builds=[
+        dict(
             duration=31698,
             description=None,
             timestamp=1481387964313,
@@ -64,10 +76,11 @@ def test_formatting():
                 dict(items=[dict(comment='world', author=dict(fullName='bar'))]),
                 dict(items=[dict(comment='again', author=dict(fullName='baz'))]),
             ]
-        )],
-    )
+        )
+    ])
+    responses.add(responses.GET, url, json=response)
 
-    result = Jenkins.format_data(response)
+    result = service.update()
 
     assert result == dict(
         name='job',
@@ -83,7 +96,8 @@ def test_formatting():
     )
 
 
-def test_aborted_formatting():
+@responses.activate
+def test_aborted_formatting(service, url):
     response = dict(
         name='job',
         builds=[dict(
@@ -93,8 +107,9 @@ def test_aborted_formatting():
             result='ABORTED',
         )],
     )
+    responses.add(responses.GET, url, json=response)
 
-    result = Jenkins.format_data(response)
+    result = service.update()
 
     assert result == dict(
         name='job',
@@ -110,8 +125,9 @@ def test_aborted_formatting():
     )
 
 
-@mock.patch('flash_services.jenkins.time.time', return_value=1481387969.3)
-def test_unfinished_formatting(_, service):
+@responses.activate
+@freeze_time(datetime.fromtimestamp(1481387969.3))
+def test_unfinished_formatting(service, url):
     response = dict(
         name='foo',
         builds=[dict(
@@ -123,8 +139,9 @@ def test_unfinished_formatting(_, service):
             changeSets=[],
         )],
     )
+    responses.add(responses.GET, url, json=response)
 
-    result = service.format_data(response)
+    result = service.update()
 
     assert result == dict(
         name='foo',
@@ -140,12 +157,9 @@ def test_unfinished_formatting(_, service):
     )
 
 
-@mock.patch('flash_services.utils.datetime', **{
-    'now.return_value': (datetime.fromtimestamp(1481387969)),
-    'fromtimestamp.side_effect': datetime.fromtimestamp,
-})
-@mock.patch('flash_services.jenkins.time.time', return_value=1481387969.3)
-def test_estimated_formatting(_, __, service):
+@freeze_time(datetime.fromtimestamp(1481387969))
+@responses.activate
+def test_estimated_formatting(service, url):
     response = dict(name='foo', builds=[
         dict(duration=0, description=None, timestamp=1481387964313, result=None),
         dict(duration=10000, description=None, timestamp=1481387964313, result='SUCCESS'),
@@ -154,8 +168,9 @@ def test_estimated_formatting(_, __, service):
         dict(duration=10000, description=None, timestamp=1481387964313, result='SUCCESS'),
         dict(duration=10000, description=None, timestamp=1481387964313, result='SUCCESS'),
     ])
+    responses.add(responses.GET, url, json=response)
 
-    result = service.format_data(response)
+    result = service.update()
 
     assert len(result['builds']) == 4
     assert result['builds'][0] == dict(

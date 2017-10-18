@@ -65,7 +65,9 @@ def test_calculate_timeout_http_date():
 
 
 def test_abstract_methods_required():
+
+    class Broken(Service):
+        """Missing abstract methods."""
+
     with pytest.raises(TypeError):
-        class Broken(Service):
-            pass
         Broken()

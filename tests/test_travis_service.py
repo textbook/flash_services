@@ -1,12 +1,13 @@
 from unittest import mock
 
 import pytest
+import responses
 
 from flash_services.core import Service
 from flash_services.travis import TravisOS
 
 
-@pytest.fixture()
+@pytest.fixture
 def service():
     return TravisOS(account='foo', app='bar')
 
@@ -31,36 +32,37 @@ def test_correct_headers(service):
 
 
 @mock.patch('flash_services.travis.logger.debug')
-@mock.patch('flash_services.travis.requests.get', **{
-    'return_value.status_code': 200,
-    'return_value.json.return_value': {},
-})
-def test_update_success(get, debug, service):
+@responses.activate
+def test_update_success(debug, service):
+    responses.add(
+        responses.GET,
+        'https://api.travis-ci.org/repos/foo/bar/builds',
+        json={},
+    )
+
     result = service.update()
 
-    get.assert_called_once_with(
-        'https://api.travis-ci.org/repos/foo/bar/builds',
-        headers=HEADERS,
-    )
     debug.assert_called_once_with('fetching Travis CI project data')
     assert result == {'builds': [], 'name': 'foo/bar', 'health': 'neutral'}
+    for key in HEADERS:
+        assert responses.calls[0].request.headers[key] == HEADERS[key]
 
 
 @mock.patch('flash_services.travis.logger.error')
-@mock.patch('flash_services.travis.requests.get', **{
-    'return_value.status_code': 401,
-})
-def test_update_failure(get, error, service):
+@responses.activate
+def test_update_failure(error, service):
+    responses.add(
+        responses.GET,
+        'https://api.travis-ci.org/repos/foo/bar/builds',
+        status=401,
+    )
     result = service.update()
 
-    get.assert_called_once_with(
-        'https://api.travis-ci.org/repos/foo/bar/builds',
-        headers=HEADERS,
-    )
     error.assert_called_once_with('failed to update Travis CI project data')
     assert result == {}
 
 
+@responses.activate
 def test_formatting(service):
     response = dict(
         builds=[dict(
@@ -75,8 +77,13 @@ def test_formatting(service):
             message='hello world',
         )],
     )
+    responses.add(
+        responses.GET,
+        'https://api.travis-ci.org/repos/foo/bar/builds',
+        json=response,
+    )
 
-    result = service.format_data(response)
+    result = service.update()
 
     assert result == dict(
         name='foo/bar',
@@ -92,6 +99,7 @@ def test_formatting(service):
     )
 
 
+@responses.activate
 @mock.patch('flash_services.core.logger.warning')
 def test_unfinished_formatting(warning, service):
     response = dict(
@@ -105,8 +113,13 @@ def test_unfinished_formatting(warning, service):
             message='some much longer message',
         )],
     )
+    responses.add(
+        responses.GET,
+        'https://api.travis-ci.org/repos/foo/bar/builds',
+        json=response,
+    )
 
-    result = service.format_data(response)
+    result = service.update()
 
     assert result == dict(
         name='foo/bar',

@@ -74,9 +74,11 @@ setup(
     platforms='any',
     tests_require=[
         'beautifulsoup4',
+        'freezegun',
         'pylint',
         'pytest',
         'pytest-pylint',
+        'responses',
     ],
     url='http://github.com/textbook/flash/',
     version=version,
