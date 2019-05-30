@@ -41,7 +41,7 @@ class MixinMeta(type):
 class ServiceMeta(ABCMeta, MixinMeta):
     """Metaclass to simplify configuration."""
 
-    def __new__(mcs, name, bases, attrs):
+    def __new__(mcs, name, bases, attrs, **kwargs):
         """Update the new class with appropriate attributes.
 
         Arguments:
@@ -59,7 +59,7 @@ class ServiceMeta(ABCMeta, MixinMeta):
 
         """
         attrs['FRIENDLY_NAME'] = attrs.get('FRIENDLY_NAME', name)
-        return super().__new__(mcs, name, bases, attrs)
+        return super().__new__(mcs, name, bases, attrs, **kwargs)
 
 
 class Service(metaclass=ServiceMeta):
