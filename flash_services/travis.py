@@ -4,7 +4,7 @@ import logging
 
 from .auth import HeaderMixin
 from .core import ContinuousIntegrationService
-from .utils import elapsed_time, estimate_time, health_summary
+from .utils import elapsed_time, estimate_time, health_summary, Outcome
 
 logger = logging.getLogger(__name__)
 
@@ -24,14 +24,14 @@ class TravisOS(ContinuousIntegrationService):
 
     ENDPOINT = '/repos/{repo}/builds'
     FRIENDLY_NAME = 'Travis CI'
-    OUTCOMES = {
-        'canceled': 'cancelled',
-        'created': 'working',
-        'failed': 'failed',
-        'passed': 'passed',
-        'started': 'working',
-        'errored': 'crashed',
-    }
+    OUTCOMES = dict(
+        canceled=Outcome.CANCELLED,
+        created=Outcome.WORKING,
+        failed=Outcome.FAILED,
+        passed=Outcome.PASSED,
+        started=Outcome.WORKING,
+        errored=Outcome.CRASHED,
+    )
     ROOT = 'https://api.travis-ci.org'
 
     def __init__(self, *, account, app, **kwargs):

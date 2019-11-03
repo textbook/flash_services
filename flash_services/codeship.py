@@ -3,7 +3,7 @@ import logging
 
 from .auth import UrlParamMixin
 from .core import ContinuousIntegrationService
-from .utils import elapsed_time, estimate_time, health_summary
+from .utils import elapsed_time, estimate_time, health_summary, Outcome
 
 logger = logging.getLogger(__name__)
 
@@ -20,14 +20,14 @@ class Codeship(UrlParamMixin, ContinuousIntegrationService):
     AUTH_PARAM = 'api_key'
     ENDPOINT = '/projects/{project_id}.json'
     FRIENDLY_NAME = 'Codeship CI'
-    OUTCOMES = {
-        'cancelled': 'cancelled',
-        'error': 'failed',
-        'infrastructure_failure': 'crashed',
-        'stopped': 'cancelled',
-        'success': 'passed',
-        'testing': 'working',
-    }
+    OUTCOMES = dict(
+        cancelled=Outcome.CANCELLED,
+        error=Outcome.FAILED,
+        infrastructure_failure=Outcome.CRASHED,
+        stopped=Outcome.CANCELLED,
+        success=Outcome.PASSED,
+        testing=Outcome.WORKING,
+    )
     ROOT = 'https://codeship.com/api/v1'
 
     def __init__(self, *, project_id, **kwargs):

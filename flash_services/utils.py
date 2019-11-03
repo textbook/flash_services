@@ -1,9 +1,10 @@
 """Useful utility functions for services."""
 
-from datetime import datetime, timezone
-from inspect import Parameter, Signature
 import logging
 import re
+from datetime import datetime, timezone
+from enum import Enum
+from inspect import Parameter, Signature
 
 from dateutil.parser import parse
 from humanize import naturaldelta, naturaltime
@@ -14,6 +15,15 @@ WORDS = {'1': 'one', '2': 'two', '3': 'three', '4': 'four', '5': 'five',
          '6': 'six', '7': 'seven', '8': 'eight', '9': 'nine', '10': 'ten'}
 
 NUMBERS = re.compile(r'\b([1-9]|10)\b')
+
+
+class Outcome(str, Enum):
+    """Possible outcomes for a CI build."""
+    WORKING = 'working'
+    PASSED = 'passed'
+    CANCELLED = 'cancelled'
+    FAILED = 'failed'
+    CRASHED = 'crashed'
 
 
 def _numeric_words(text):
@@ -146,9 +156,9 @@ def health_summary(builds):
 
     """
     for build in builds:
-        if build['outcome'] == 'passed':
+        if build['outcome'] in {Outcome.PASSED}:
             return 'ok'
-        elif build['outcome'] in ['failed', 'crashed']:
+        elif build['outcome'] in {Outcome.CRASHED, Outcome.FAILED}:
             return 'error'
         else:
             continue

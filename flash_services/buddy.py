@@ -3,7 +3,7 @@ import logging
 
 from .auth import BearerAuthHeaderMixin
 from .core import ContinuousIntegrationService
-from .utils import elapsed_time, estimate_time, health_summary
+from .utils import elapsed_time, estimate_time, health_summary, Outcome
 
 logger = logging.getLogger(__name__)
 
@@ -21,10 +21,10 @@ class Buddy(BearerAuthHeaderMixin, ContinuousIntegrationService):
 
     ENDPOINT = '/workspaces/{domain}/projects/{project_name}/pipelines/{pipeline_id}/executions'
     OUTCOMES = dict(
-        FAILED='failed',
-        INPROGRESS='working',
-        SUCCESSFUL='passed',
-        TERMINATED='cancelled',
+        FAILED=Outcome.FAILED,
+        INPROGRESS=Outcome.WORKING,
+        SUCCESSFUL=Outcome.PASSED,
+        TERMINATED=Outcome.CANCELLED,
     )
     ROOT = 'https://api.buddy.works'
 
