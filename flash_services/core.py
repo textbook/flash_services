@@ -93,11 +93,11 @@ class Service(metaclass=ServiceMeta):
 
     def update(self):
         """Get the current state to display on the dashboard."""
-        logger.debug('fetching {} project data'.format(self.FRIENDLY_NAME))
+        logger.debug('fetching %s project data', self.FRIENDLY_NAME)
         response = requests.get(self.url, headers=self.headers)
         if response.status_code == 200:
             return self.format_data(response.json())
-        logger.error('failed to update {} project data'.format(self.FRIENDLY_NAME))
+        logger.error('failed to update %s project data', self.FRIENDLY_NAME)
         return {}
 
     @abstractmethod

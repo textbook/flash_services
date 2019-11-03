@@ -3,8 +3,6 @@
 import logging
 import time
 
-import requests
-
 from .auth import BasicAuthHeaderMixin
 from .core import ContinuousIntegrationService, CustomRootMixin
 from .utils import estimate_time, health_summary, naturaldelta

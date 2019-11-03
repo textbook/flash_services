@@ -49,7 +49,7 @@ def test_update_success(service, caplog, mocked_responses, buddy_json):
 
     assert mocked_responses.calls[0].request.headers['Authorization'] == 'Bearer foo'
     assert 'fetching Buddy project data' in [
-        record.msg
+        record.getMessage()
         for record in caplog.records
         if record.levelno == logging.DEBUG
     ]
@@ -79,7 +79,7 @@ def test_update_failure(service, caplog, mocked_responses):
     result = service.update()
 
     assert 'failed to update Buddy project data' in [
-        record.msg
+        record.getMessage()
         for record in caplog.records
         if record.levelno == logging.ERROR
     ]
