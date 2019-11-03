@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 
 import pytest
 import responses
@@ -16,7 +17,8 @@ def service():
 @pytest.fixture
 def buddy_json():
     """Example from https://buddy.works/docs/api/pipelines/executions/list."""
-    with open('buddy.json') as json_file:
+    here = os.path.dirname(__file__)
+    with open('{}/buddy.json'.format(here)) as json_file:
         return json.load(json_file)
 
 
