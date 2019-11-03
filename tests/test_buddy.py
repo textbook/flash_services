@@ -82,9 +82,17 @@ def test_update_failure(service, caplog, mocked_responses):
     assert result == {}
 
 
-@pytest.mark.parametrize('input_, expected,', [
+@pytest.mark.parametrize('commit, expected,', [
     (dict(author=dict(name='Jane Doe')), 'Jane Doe'),
     (dict(author=dict(title=None), committer=dict(name='Jane Doe')), 'Jane Doe'),
 ])
-def test_get_name(input_, expected):
-    assert Buddy.get_name(input_) == expected
+def test_get_name(commit, expected):
+    assert Buddy.get_name(commit) == expected
+
+
+@pytest.mark.parametrize('build, commit, expected,', [
+    (dict(comment=''), dict(message='Hello, world!'), 'Hello, world!'),
+    (dict(comment='Hello, world!'), {}, 'Hello, world!'),
+])
+def test_get_message(build, commit, expected):
+    assert Buddy.get_message(build, commit) == expected

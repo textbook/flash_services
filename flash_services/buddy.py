@@ -68,15 +68,29 @@ class Buddy(BearerAuthHeaderMixin, ContinuousIntegrationService):
         )
         commit = build.get('to_revision', {})
         return super().format_build(dict(
-            author=Buddy.get_name(commit),
+            author=cls.get_name(commit),
             duration=(
                 None if start is None or finish is None else finish - start
             ),
             elapsed=elapsed,
-            message=commit.get('message'),
+            message=cls.get_message(build, commit),
             outcome=build.get('status'),
             started_at=start,
         ))
+
+    @staticmethod
+    def get_message(build, commit):
+        """Extract the message from the commit or comment.
+
+        Arguments:
+          build (:py:class:`dict`): The JSON data from the response.
+          commit (:py:class:`dict`): The JSON data from the response.
+
+        Returns:
+          :py:class:`str`: The commit or comment message.
+
+        """
+        return build.get("comment") or commit.get('message')
 
     @staticmethod
     def get_name(commit):
