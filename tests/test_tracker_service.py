@@ -1,4 +1,4 @@
-from unittest import mock
+import logging
 
 import pytest
 import responses
@@ -47,9 +47,9 @@ def test_get_velocity_success(service):
     assert responses.calls[0].request.headers['X-TrackerToken'] == 'foobar'
 
 
-@mock.patch('flash_services.tracker.logger.debug')
 @responses.activate
-def test_update_success(debug, service):
+def test_update_success(service, caplog):
+    caplog.set_level(logging.DEBUG)
     service.current_iteration = 1
     service.project_version = 2
     service._cached = {'foo': 'bar'}
@@ -62,14 +62,17 @@ def test_update_success(debug, service):
 
     result = service.update()
 
-    debug.assert_called_once_with('fetching Tracker project data')
+    assert 'fetching Tracker project data' in [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.DEBUG
+    ]
     assert result == {'foo': 'bar'}
     assert responses.calls[0].request.headers['X-TrackerToken'] == 'foobar'
 
 
-@mock.patch('flash_services.tracker.logger.error')
 @responses.activate
-def test_get_velocity_failure(error, service):
+def test_get_velocity_failure(service, caplog):
     responses.add(
         responses.GET,
         'https://www.pivotaltracker.com/services/v5/projects/123/iterations'
@@ -79,14 +82,17 @@ def test_get_velocity_failure(error, service):
 
     result = service.details(456)
 
-    error.assert_called_once_with('failed to update project iteration details')
+    assert 'failed to update project iteration details' in [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.ERROR
+    ]
     assert result == {}
     assert responses.calls[0].request.headers['X-TrackerToken'] == 'foobar'
 
 
-@mock.patch('flash_services.tracker.logger.error')
 @responses.activate
-def test_update_failure(error, service):
+def test_update_failure(service, caplog):
     responses.add(
         responses.GET,
         'https://www.pivotaltracker.com/services/v5/projects/123',
@@ -95,14 +101,18 @@ def test_update_failure(error, service):
 
     result = service.update()
 
-    error.assert_called_once_with('failed to update Tracker project data')
+    assert 'failed to update Tracker project data' in [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.ERROR
+    ]
     assert result == {}
     assert responses.calls[0].request.headers['X-TrackerToken'] == 'foobar'
 
 
-@mock.patch('flash_services.tracker.logger.debug')
 @responses.activate
-def test_update_details(debug, service):
+def test_update_details(service, caplog):
+    caplog.set_level(logging.DEBUG)
     service.current_iteration = 1
     service.project_version = 1
     service._cached = {'foo': 'bar'}
@@ -122,10 +132,13 @@ def test_update_details(debug, service):
 
     result = service.update()
 
-    debug.assert_has_calls([
-        mock.call('fetching Tracker project data'),
-        mock.call('project updated, fetching iteration details'),
-    ])
+    debug_logs = [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.DEBUG
+    ]
+    assert 'fetching Tracker project data' in debug_logs
+    assert 'project updated, fetching iteration details' in debug_logs
     assert result == dict(velocity=10, stories={}, name=name)
 
 

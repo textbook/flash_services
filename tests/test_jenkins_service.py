@@ -1,10 +1,10 @@
+import logging
 from datetime import datetime
-from unittest import mock
 from urllib.parse import quote_plus
 
-from freezegun import freeze_time
 import pytest
 import responses
+from freezegun import freeze_time
 
 from flash_services import Jenkins, SERVICES
 
@@ -36,9 +36,9 @@ def test_correct_config():
     assert Jenkins.TEMPLATE == 'ci-section'
 
 
-@mock.patch('flash_services.jenkins.logger.debug')
 @responses.activate
-def test_update_success(debug, service, url):
+def test_update_success(service, url, caplog):
+    caplog.set_level(logging.DEBUG)
     responses.add(
         responses.GET,
         url,
@@ -48,18 +48,25 @@ def test_update_success(debug, service, url):
 
     result = service.update()
 
-    debug.assert_called_once_with('fetching Jenkins project data')
+    assert 'fetching Jenkins project data' in [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.DEBUG
+    ]
     assert result == {'builds': [], 'name': 'baz', 'health': 'neutral'}
 
 
-@mock.patch('flash_services.jenkins.logger.error')
 @responses.activate
-def test_update_failure(error, service, url):
+def test_update_failure(service, url, caplog):
     responses.add(responses.GET, url, status=401)
 
     result = service.update()
 
-    error.assert_called_once_with('failed to update Jenkins project data')
+    assert 'failed to update Jenkins project data' in [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.ERROR
+    ]
     assert result == {}
 
 

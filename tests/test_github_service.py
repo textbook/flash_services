@@ -1,5 +1,5 @@
+import logging
 from datetime import datetime, timedelta
-from unittest import mock
 
 import pytest
 import responses
@@ -43,9 +43,9 @@ TWO_DAYS_AGO = (datetime.now() - timedelta(days=2, hours=12)).strftime(
 )
 
 
-@mock.patch('flash_services.github.logger.debug')
 @responses.activate
-def test_update_success(debug, service):
+def test_update_success(service, caplog):
+    caplog.set_level(logging.DEBUG)
     responses.add(
         responses.GET,
         'https://api.github.com/repos/foo/bar/commits?access_token=foobar',
@@ -58,7 +58,11 @@ def test_update_success(debug, service):
 
     result = service.update()
 
-    debug.assert_called_once_with('fetching GitHub project data')
+    assert 'fetching GitHub project data' in [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.DEBUG
+    ]
     assert result == {'commits': [{
         'message': 'commit message',
         'author': 'alice [bob]',
@@ -66,9 +70,10 @@ def test_update_success(debug, service):
     }], 'name': 'foo/bar'}
     assert responses.calls[0].request.headers['User-Agent'] == 'bar'
 
-@mock.patch('flash_services.github.logger.debug')
+
 @responses.activate
-def test_update_enterprise_success(debug):
+def test_update_enterprise_success(caplog):
+    caplog.set_level(logging.DEBUG)
     responses.add(
         responses.GET,
         'http://dummy.url/repos/foo/bar/commits?access_token=foobar',
@@ -84,7 +89,11 @@ def test_update_enterprise_success(debug):
 
     result = service.update()
 
-    debug.assert_called_once_with('fetching GitHub project data')
+    assert 'fetching GitHub project data' in [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.DEBUG
+    ]
     assert result == {'commits': [{
         'message': 'commit message',
         'author': 'alice [bob]',
@@ -93,9 +102,8 @@ def test_update_enterprise_success(debug):
     assert responses.calls[0].request.headers['User-Agent'] == 'bar'
 
 
-@mock.patch('flash_services.github.logger.error')
 @responses.activate
-def test_update_failure(error, service):
+def test_update_failure(service, caplog):
     responses.add(
         responses.GET,
         'https://api.github.com/repos/foo/bar/commits?access_token=foobar',
@@ -104,7 +112,11 @@ def test_update_failure(error, service):
 
     result = service.update()
 
-    error.assert_called_once_with('failed to update GitHub project data')
+    assert 'failed to update GitHub project data' in [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.ERROR
+    ]
     assert result == {}
     assert responses.calls[0].request.headers['User-Agent'] == 'bar'
 

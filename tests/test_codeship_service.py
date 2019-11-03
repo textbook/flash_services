@@ -1,10 +1,10 @@
-from unittest import mock
+import logging
 
 import pytest
 import responses
 
-from flash_services.core import Service
 from flash_services.codeship import Codeship
+from flash_services.core import Service
 
 
 @pytest.fixture
@@ -23,9 +23,9 @@ def test_correct_config():
     assert Codeship.TEMPLATE == 'ci-section'
 
 
-@mock.patch('flash_services.codeship.logger.debug')
 @responses.activate
-def test_update_success(debug, service):
+def test_update_success(service, caplog):
+    caplog.set_level(logging.DEBUG)
     responses.add(
         responses.GET,
         'https://codeship.com/api/v1/projects/123.json?api_key=foobar',
@@ -34,13 +34,16 @@ def test_update_success(debug, service):
 
     result = service.update()
 
-    debug.assert_called_once_with('fetching Codeship project data')
+    assert 'fetching Codeship project data' in [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.DEBUG
+    ]
     assert result == {'builds': [], 'name': 'bar', 'health': 'neutral'}
 
 
-@mock.patch('flash_services.codeship.logger.error')
 @responses.activate
-def test_update_failure(error, service):
+def test_update_failure(service, caplog):
     responses.add(
         responses.GET,
         'https://codeship.com/api/v1/projects/123.json?api_key=foobar',
@@ -49,7 +52,11 @@ def test_update_failure(error, service):
 
     result = service.update()
 
-    error.assert_called_once_with('failed to update Codeship project data')
+    assert 'failed to update Codeship project data' in [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.ERROR
+    ]
     assert result == {}
 
 
@@ -86,9 +93,8 @@ def test_formatting(service):
     )
 
 
-@mock.patch('flash_services.core.logger.warning')
 @responses.activate
-def test_unfinished_formatting(warning, service):
+def test_unfinished_formatting(service, caplog):
     responses.add(
         responses.GET,
         'https://codeship.com/api/v1/projects/123.json?api_key=foobar',
@@ -118,4 +124,8 @@ def test_unfinished_formatting(warning, service):
         )],
         health='neutral',
     )
-    warning.assert_called_once_with('unknown outcome: %s', 'garbage')
+    assert 'unknown outcome: garbage' in [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.WARN
+    ]

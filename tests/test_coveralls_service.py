@@ -1,9 +1,8 @@
+import logging
 from datetime import datetime
-from unittest import mock
-
-import pytest
 from datetime import timedelta
 
+import pytest
 import responses
 
 from flash_services.coveralls import Coveralls
@@ -96,9 +95,8 @@ def test_format_build_missing_data(service):
     )
 
 
-@mock.patch('flash_services.coveralls.logger.error')
 @responses.activate
-def test_update_failure(error, service):
+def test_update_failure(service, caplog):
     responses.add(
         responses.GET,
         'https://coveralls.io/foo/bar/baz.json?page=1',
@@ -107,5 +105,9 @@ def test_update_failure(error, service):
 
     result = service.update()
 
-    error.assert_called_once_with('failed to update Coveralls project data')
+    assert 'failed to update Coveralls project data' in [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.ERROR
+    ]
     assert result == {}

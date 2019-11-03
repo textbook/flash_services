@@ -1,4 +1,4 @@
-from unittest import mock
+import logging
 
 import pytest
 import responses
@@ -33,9 +33,9 @@ def test_correct_headers(service):
     assert service.headers == HEADERS
 
 
-@mock.patch('flash_services.travis.logger.debug')
 @responses.activate
-def test_update_success(debug, service):
+def test_update_success(service, caplog):
+    caplog.set_level(logging.DEBUG)
     responses.add(
         responses.GET,
         'https://api.travis-ci.com/repos/foo/bar/builds',
@@ -44,15 +44,18 @@ def test_update_success(debug, service):
 
     result = service.update()
 
-    debug.assert_called_once_with('fetching Travis CI project data')
+    assert 'fetching Travis CI project data' in [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.DEBUG
+    ]
     assert result == {'builds': [], 'name': 'foo/bar', 'health': 'neutral'}
     for key in HEADERS:
         assert responses.calls[0].request.headers[key] == HEADERS[key]
 
 
-@mock.patch('flash_services.travis.logger.error')
 @responses.activate
-def test_update_failure(error, service):
+def test_update_failure(service, caplog):
     responses.add(
         responses.GET,
         'https://api.travis-ci.com/repos/foo/bar/builds',
@@ -61,7 +64,11 @@ def test_update_failure(error, service):
 
     result = service.update()
 
-    error.assert_called_once_with('failed to update Travis CI project data')
+    assert 'failed to update Travis CI project data' in [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.ERROR
+    ]
     assert result == {}
 
 
@@ -102,9 +109,8 @@ def test_formatting(service):
     )
 
 
-@mock.patch('flash_services.core.logger.warning')
 @responses.activate
-def test_unfinished_formatting(warning, service):
+def test_unfinished_formatting(service, caplog):
     response = dict(
         builds=[dict(
             commit_id=123456,
@@ -136,4 +142,8 @@ def test_unfinished_formatting(warning, service):
         )],
         health='neutral',
     )
-    warning.assert_called_once_with('unknown outcome: %s', 'garbage')
+    assert 'unknown outcome: garbage' in [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.WARN
+    ]
