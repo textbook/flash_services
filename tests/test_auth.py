@@ -4,6 +4,7 @@ from flash_services.core import Service
 
 class BasicAuthParent(BasicAuthHeaderMixin, Service):
     def update(self): pass
+    def format_data(self, data): pass
 
 
 def test_basic_auth():

@@ -24,6 +24,7 @@ class TravisOS(ContinuousIntegrationService):
 
     """
 
+    ENDPOINT = '/repos/{repo}/builds'
     FRIENDLY_NAME = 'Travis CI'
     OUTCOMES = {
         'canceled': 'cancelled',
@@ -49,20 +50,6 @@ class TravisOS(ContinuousIntegrationService):
             'User-Agent': 'Flash',
         })
         return headers
-
-    def update(self):
-        logger.debug('fetching Travis CI project data')
-        response = requests.get(
-            self.url_builder(
-                '/repos/{repo}/builds',
-                params={'repo': self.repo},
-            ),
-            headers=self.headers,
-        )
-        if response.status_code == 200:
-            return self.format_data(response.json())
-        logger.error('failed to update Travis CI project data')
-        return {}
 
     def format_data(self, data):
         """Re-format the response data for the front-end.
@@ -129,6 +116,7 @@ class TravisPro(HeaderMixin, TravisOS):
     """
 
     AUTH_HEADER = 'Authorization'
+    FRIENDLY_NAME = 'Travis CI'
     ROOT = TravisOS.ROOT.replace('.org', '.com')
 
     def __init__(self, *, api_token, **kwargs):

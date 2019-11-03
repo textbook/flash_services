@@ -1,11 +1,13 @@
 """Core service description."""
 
 from abc import ABCMeta, abstractmethod
+from collections import OrderedDict
 from datetime import datetime
 from datetime import timezone
 import logging
 from urllib.parse import urlencode
 
+import requests
 from dateutil.parser import parse
 
 from .utils import provided_args, remove_tags, required_args
@@ -70,13 +72,16 @@ class ServiceMeta(ABCMeta, MixinMeta):
 class Service(metaclass=ServiceMeta):
     """Abstract base class for services."""
 
+    ENDPOINT = None
+    """:py:class:`str`: The endpoint URL template for the service API."""
+
     FRIENDLY_NAME = None
     """:py:class:`str`: The friendly name of the service."""
 
     REQUIRED = set()
     """:py:class:`set`: The service's required configuration keys."""
 
-    ROOT = ''
+    ROOT = None
     """:py:class:`str`: The root URL for the service API."""
 
     TEMPLATE = 'undefined-section'
@@ -86,15 +91,46 @@ class Service(metaclass=ServiceMeta):
     def __init__(self, **kwargs):
         self.service_name = kwargs.get('name')
 
-    @abstractmethod
     def update(self):
         """Get the current state to display on the dashboard."""
+        logger.debug('fetching {} project data'.format(self.FRIENDLY_NAME))
+        response = requests.get(self.url, headers=self.headers)
+        if response.status_code == 200:
+            return self.format_data(response.json())
+        logger.error('failed to update {} project data'.format(self.FRIENDLY_NAME))
+        return {}
+
+    @abstractmethod
+    def format_data(self, data):
+        """Re-format the response data for the front-end.
+
+        Arguments:
+          data (:py:class:`dict`): The JSON data from the response.
+
+        Returns:
+          :py:class:`dict`: The re-formatted data.
+
+        """
         raise NotImplementedError
+
+    @property
+    def url(self):
+        """Generate the URL for the service request."""
+        return self.url_builder(
+            self.ENDPOINT,
+            root=getattr(self, 'root', self.ROOT),
+            params=self.__dict__,
+            url_params=self.url_params,
+        )
 
     @property
     def headers(self):
         """Get the headers for the service requests."""
         return {}
+
+    @property
+    def url_params(self):
+        return OrderedDict()
 
     def url_builder(self, endpoint, *, root=None, params=None, url_params=None):
         """Create a URL for the specified endpoint.

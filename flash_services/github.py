@@ -1,15 +1,12 @@
 """Defines the GitHub service integration."""
 
-from collections import defaultdict, OrderedDict
-from datetime import timedelta
 import logging
-
-import requests
+from collections import defaultdict
+from datetime import timedelta
 
 from .auth import UrlParamMixin
 from .core import CustomRootMixin, ThresholdMixin, VersionControlService
 from .utils import naturaldelta, occurred, safe_parse
-
 
 logger = logging.getLogger(__name__)
 
@@ -31,11 +28,11 @@ class GitHub(UrlParamMixin, VersionControlService):
     """
 
     AUTH_PARAM = 'access_token'
+    ENDPOINT = '/repos/{repo_name}/commits'
     ROOT = 'https://api.github.com'
 
     def __init__(self, *, account, repo, branch=None, **kwargs):
         super().__init__(**kwargs)
-        self.account = account
         self.repo = repo
         self.branch = branch
         self.repo_name = '{}/{}'.format(account, repo)
@@ -53,38 +50,29 @@ class GitHub(UrlParamMixin, VersionControlService):
         headers['User-Agent'] = self.repo
         return headers
 
-    def update(self):
-        logger.debug('fetching GitHub project data')
-        url_prm = OrderedDict(sha=self.branch) if self.branch else OrderedDict()
-        response = requests.get(
-            self.url_builder(
-                '/repos/{repo}/commits',
-                params={'repo': self.repo_name},
-                url_params=url_prm,
-            ),
-            headers=self.headers,
-        )
-        if response.status_code == 200:
-            return self.format_data(self.name, response.json())
-        logger.error('failed to update GitHub project data')
-        return {}
+    @property
+    def url_params(self):
+        params = super().url_params
+        if self.branch:
+            params['sha'] = self.branch
+        return params
 
-    @classmethod
-    def format_data(cls, name, data):
+    def format_data(self, data):
         """Re-format the response data for the front-end.
 
         Arguments:
           data (:py:class:`list`): The JSON data from the response.
-          name (:py:class:`str`): The name of the repository.
 
         Returns:
           :py:class:`dict`: The re-formatted data.
 
         """
         return dict(
-            commits=[cls.format_commit(commit.get('commit', {}))
-                     for commit in data[:5] or []],
-            name=name,
+            commits=[
+                self.format_commit(commit.get('commit', {}))
+                for commit in data[:5] or []
+            ],
+            name=self.name,
         )
 
     @classmethod
@@ -116,6 +104,7 @@ class GitHub(UrlParamMixin, VersionControlService):
 class GitHubIssues(ThresholdMixin, GitHub):
     """Show the current status of GitHub issues and pull requests."""
 
+    ENDPOINT = '/repos/{repo_name}/issues'
     FRIENDLY_NAME = 'GitHub Issues'
     NEUTRAL_THRESHOLD = 30
     OK_THRESHOLD = 7
@@ -125,23 +114,13 @@ class GitHubIssues(ThresholdMixin, GitHub):
         super().__init__(**kwargs)
         self.branch = None  # branches aren't relevant for issues
 
-    def update(self):
-        logger.debug('fetching GitHub issue data')
-        url_params = OrderedDict(state='all')
-        response = requests.get(
-            self.url_builder(
-                '/repos/{repo}/issues',
-                params={'repo': self.repo_name},
-                url_params=url_params,
-            ),
-            headers=self.headers,
-        )
-        if response.status_code == 200:
-            return self.format_data(self.name, response.json())
-        logger.error('failed to update GitHub issue data')
-        return {}
+    @property
+    def url_params(self):
+        params = super().url_params
+        params['state'] = 'all'
+        return params
 
-    def format_data(self, name, data):
+    def format_data(self, data):
         counts = defaultdict(int)
         for issue in data:
             if issue.get('pull_request') is not None:
@@ -153,7 +132,7 @@ class GitHubIssues(ThresholdMixin, GitHub):
             halflife=naturaldelta(half_life),
             health=self.health_summary(half_life),
             issues=counts,
-            name=name,
+            name=self.name,
         )
 
     @staticmethod

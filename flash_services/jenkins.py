@@ -27,6 +27,8 @@ class Jenkins(BasicAuthHeaderMixin, CustomRootMixin,
 
     """
 
+    ENDPOINT = '/job/{job}/api/json'
+
     OUTCOMES = {
         None: 'working',
         'WORKING': 'working',
@@ -43,20 +45,11 @@ class Jenkins(BasicAuthHeaderMixin, CustomRootMixin,
         super().__init__(**kwargs)
         self.job = job
 
-    def update(self):
-        logger.debug('fetching Jenkins project data')
-        response = requests.get(
-            self.url_builder(
-                '/job/{job}/api/json',
-                params={'job': self.job},
-                url_params={'tree': self.TREE_PARAMS}
-            ),
-            headers=self.headers
-        )
-        if response.status_code != 200:
-            logger.error('failed to update Jenkins project data')
-            return {}
-        return self.format_data(response.json())
+    @property
+    def url_params(self):
+        params = super().url_params
+        params['tree'] = self.TREE_PARAMS
+        return params
 
     @classmethod
     def format_data(cls, data):

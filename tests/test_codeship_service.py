@@ -34,7 +34,7 @@ def test_update_success(service, caplog):
 
     result = service.update()
 
-    assert 'fetching Codeship project data' in [
+    assert 'fetching Codeship CI project data' in [
         record.getMessage()
         for record in caplog.records
         if record.levelno == logging.DEBUG
@@ -52,7 +52,7 @@ def test_update_failure(service, caplog):
 
     result = service.update()
 
-    assert 'failed to update Codeship project data' in [
+    assert 'failed to update Codeship CI project data' in [
         record.getMessage()
         for record in caplog.records
         if record.levelno == logging.ERROR

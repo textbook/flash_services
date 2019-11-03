@@ -1,9 +1,6 @@
 """Defines the GitHub service integration."""
 
-from collections import OrderedDict
 import logging
-
-import requests
 
 from .auth import Unauthenticated
 from .core import Service, ThresholdMixin
@@ -31,6 +28,7 @@ class Coveralls(Unauthenticated, ThresholdMixin, Service):
 
     """
 
+    ENDPOINT = '/{repo_name}.json'
     FRIENDLY_NAME = 'Coveralls'
     NEUTRAL_THRESHOLD = 50
     OK_THRESHOLD = 80
@@ -39,36 +37,19 @@ class Coveralls(Unauthenticated, ThresholdMixin, Service):
 
     def __init__(self, *, vcs_name, account, repo, **kwargs):
         super().__init__(**kwargs)
-        self.account = account
-        self.repo = repo
-        self.vcs_name = vcs_name
+        self.repo_name = '/'.join([vcs_name, account, repo])
 
     @property
-    def repo_name(self):
-        """A neatly-formatted version of the name of the repo."""
-        return '/'.join([self.vcs_name, self.account, self.repo])
+    def url_params(self):
+        params = super().url_params
+        params['page'] = 1
+        return params
 
-    def update(self):
-        logger.debug('fetching Coveralls project data')
-        response = requests.get(
-            self.url_builder(
-                '/{repo}.json',
-                params={'repo': self.repo_name},
-                url_params=OrderedDict(page=1),
-            ),
-            headers=self.headers,
-        )
-        if response.status_code == 200:
-            return self.format_data(self.repo_name, response.json())
-        logger.error('failed to update Coveralls project data')
-        return {}
-
-    def format_data(self, name, data):
+    def format_data(self, data):
         """Re-format the response data for the front-end.
 
         Arguments:
           data (:py:class:`dict`): The JSON data from the response.
-          name (:py:class:`str`): The name of the repository.
 
         Returns:
           :py:class:`dict`: The re-formatted data.
@@ -79,7 +60,7 @@ class Coveralls(Unauthenticated, ThresholdMixin, Service):
         return dict(
             builds=builds[:4],
             health=self.health(builds[0] if builds else None),
-            name=name,
+            name=self.repo_name,
         )
 
     def health(self, last_build):

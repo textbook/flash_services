@@ -1,8 +1,6 @@
 """Defines the Codeship CI service integration."""
 import logging
 
-import requests
-
 from .auth import UrlParamMixin
 from .core import ContinuousIntegrationService
 from .utils import elapsed_time, estimate_time, health_summary
@@ -20,6 +18,7 @@ class Codeship(UrlParamMixin, ContinuousIntegrationService):
     """
 
     AUTH_PARAM = 'api_key'
+    ENDPOINT = '/projects/{project_id}.json'
     FRIENDLY_NAME = 'Codeship CI'
     OUTCOMES = {
         'cancelled': 'cancelled',
@@ -34,17 +33,6 @@ class Codeship(UrlParamMixin, ContinuousIntegrationService):
     def __init__(self, *, project_id, **kwargs):
         super().__init__(**kwargs)
         self.project_id = project_id
-
-    def update(self):
-        logger.debug('fetching Codeship project data')
-        response = requests.get(self.url_builder(
-            '/projects/{id}.json',
-            params={'id': self.project_id},
-        ))
-        if response.status_code == 200:
-            return self.format_data(response.json())
-        logger.error('failed to update Codeship project data')
-        return {}
 
     @classmethod
     def format_data(cls, data):

@@ -53,14 +53,25 @@ class Tracker(HeaderMixin, Service):
         )
         response = requests.get(url, headers=self.headers)
         if response.status_code == 200:
-            update = response.json()
-            return dict(
-                stories=self.story_summary(update.get('stories', [])),
-                velocity=update.get('velocity', 'unknown'),
-            )
+            return self.format_data(response.json())
         else:
             logger.error('failed to update project iteration details')
         return {}
+
+    def format_data(self, data):
+        """Re-format the response data for the front-end.
+
+        Arguments:
+          data (:py:class:`dict`): The JSON data from the response.
+
+        Returns:
+          :py:class:`dict`: The re-formatted data.
+
+        """
+        return dict(
+            stories=self.story_summary(data.get('stories', [])),
+            velocity=data.get('velocity', 'unknown'),
+        )
 
     @staticmethod
     def story_summary(stories):

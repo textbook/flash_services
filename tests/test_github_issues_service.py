@@ -44,7 +44,7 @@ def test_update_success(service, caplog):
 
     result = service.update()
 
-    assert 'fetching GitHub issue data' in [
+    assert 'fetching GitHub Issues project data' in [
         record.getMessage()
         for record in caplog.records
         if record.levelno == logging.DEBUG
@@ -70,7 +70,7 @@ def test_update_enterprise_success(caplog):
 
     result = service.update()
 
-    assert 'fetching GitHub issue data' in [
+    assert 'fetching GitHub Issues project data' in [
         record.getMessage()
         for record in caplog.records
         if record.levelno == logging.DEBUG
@@ -90,7 +90,7 @@ def test_update_failure(service, caplog):
 
     result = service.update()
 
-    assert 'failed to update GitHub issue data' in [
+    assert 'failed to update GitHub Issues project data' in [
         record.getMessage()
         for record in caplog.records
         if record.levelno == logging.ERROR
@@ -174,6 +174,6 @@ def test_adjust_threshold():
     issues = [
         {'state': 'closed', 'created_at': '2010/10/12', 'closed_at': '2010/10/15'},
     ]
-    assert service.format_data('', issues).get('health') == 'neutral'
+    assert service.format_data(issues).get('health') == 'neutral'
     service.neutral_threshold = 2
-    assert service.format_data('', issues).get('health') == 'error'
+    assert service.format_data(issues).get('health') == 'error'

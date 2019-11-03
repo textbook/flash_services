@@ -16,6 +16,9 @@ class Fake(Service):
     def update(self):
         pass
 
+    def format_data(self, data):
+        pass
+
 
 @pytest.mark.parametrize('config', [
     {},
