@@ -1,5 +1,5 @@
+import logging
 from datetime import datetime, timedelta
-from unittest import mock
 
 import pytest
 
@@ -15,13 +15,16 @@ TWO_DAYS_AGO = datetime.now() - timedelta(days=2, hours=12)
     ((TWO_DAYS_AGO.strftime('%Y-%m-%dT%H:%M:%SZ'),), 'two days ago', False),
     ((TWO_DAYS_AGO.strftime('%Y-%m-%dT%H:%M:%S'),), 'two days ago', False),
 ])
-@mock.patch('flash_services.utils.logger.warning')
-def test_occurred(logger, input_, expected, logged):
+def test_occurred(input_, expected, logged, caplog):
     assert occurred(*input_) == expected
     if logged:
-        logger.assert_called_once_with('failed to parse occurrence time %r', None)
+        assert 'failed to parse occurrence time None' in [
+            record.getMessage()
+            for record in caplog.records
+            if record.levelno == logging.WARN
+        ]
     else:
-        logger.assert_not_called()
+        assert caplog.records == []
 
 
 @pytest.mark.parametrize('input_, expected, logged', [
@@ -42,13 +45,16 @@ def test_occurred(logger, input_, expected, logged):
         False,
     ),
 ])
-@mock.patch('flash_services.utils.logger.warning')
-def test_elapsed_time(logger, input_, expected, logged):
+def test_elapsed_time(input_, expected, logged, caplog):
     assert elapsed_time(*input_) == expected
     if logged:
-        logger.assert_called_once_with('failed to generate elapsed time')
+        assert 'failed to generate elapsed time' in [
+            record.getMessage()
+            for record in caplog.records
+            if record.levelno == logging.WARN
+        ]
     else:
-        logger.assert_not_called()
+        assert caplog.records == []
 
 
 @pytest.mark.parametrize('text, expected', [
