@@ -32,17 +32,11 @@ class UrlParamMixin(TokenAuthMixin):
     AUTH_PARAM = None
     """:py:class:`str`: The name of the URL parameter."""
 
-    def url_builder(self, endpoint, *, root=None, params=None, url_params=None):
-        """Add authentication URL parameter."""
-        if url_params is None:
-            url_params = OrderedDict()
-        url_params[self.AUTH_PARAM] = self.api_token
-        return super().url_builder(
-            endpoint,
-            root=root,
-            params=params,
-            url_params=url_params,
-        )
+    @property
+    def url_params(self):
+        params = super().url_params
+        params[self.AUTH_PARAM] = self.api_token
+        return params
 
 
 class HeaderMixin(TokenAuthMixin):
