@@ -6,6 +6,7 @@ from uuid import uuid4
 
 from flask import Blueprint
 
+from .buddy import Buddy
 from .codeship import Codeship
 from .coveralls import Coveralls
 from .github import (GitHub, GitHubEnterprise, GitHubEnterpriseIssues,
@@ -15,7 +16,7 @@ from .tracker import Tracker
 from .travis import TravisOS, TravisPro
 
 __author__ = 'Jonathan Sharpe'
-__version__ = '0.8.0'
+__version__ = '0.9.0'
 
 blueprint = Blueprint(
     'services',
@@ -27,6 +28,7 @@ blueprint = Blueprint(
 logger = logging.getLogger(__name__)
 
 SERVICES = dict(
+    buddy=Buddy,
     codeship=Codeship,
     coveralls=Coveralls,
     github=GitHub,
