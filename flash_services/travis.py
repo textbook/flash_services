@@ -131,6 +131,6 @@ class TravisPro(HeaderMixin, TravisOS):
     AUTH_HEADER = 'Authorization'
     ROOT = TravisOS.ROOT.replace('.org', '.com')
 
-    def __init__(self, **kwargs):
-        kwargs['api_token'] = 'token "{}"'.format(kwargs['api_token'])
-        super().__init__(**kwargs)
+    def __init__(self, *, api_token, **kwargs):
+        api_token = 'token "{}"'.format(api_token)
+        super().__init__(api_token=api_token, **kwargs)

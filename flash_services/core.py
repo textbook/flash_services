@@ -8,7 +8,7 @@ from urllib.parse import urlencode
 
 from dateutil.parser import parse
 
-from .utils import remove_tags, required_args
+from .utils import provided_args, remove_tags, required_args
 
 logger = logging.getLogger(__name__)
 
@@ -30,11 +30,16 @@ class MixinMeta(type):
 
         Note:
           The ``REQUIRED`` configuration of each class is the union of
-          the required configuration keys of all of its base classes.
+          the required configuration keys of all of its base classes,
+          excluding the ``PROVIDED`` configuration keys.
 
         """
+        base_provided = [provided_args(base.__dict__) for base in bases]
+        all_provided = set.union(provided_args(attrs), *base_provided)
+        attrs['PROVIDED'] = all_provided
         base_required = [required_args(base.__dict__) for base in bases]
-        attrs['REQUIRED'] = set.union(required_args(attrs), *base_required)
+        all_required = set.union(required_args(attrs), *base_required)
+        attrs['REQUIRED'] = set.difference(all_required, all_provided)
         return super().__new__(mcs, name, bases, attrs)
 
 

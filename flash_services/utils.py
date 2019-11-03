@@ -265,3 +265,16 @@ def required_args(attrs):
     if 'REQUIRED' in attrs:
         attr_args = attrs['REQUIRED']
     return set.union(attr_args, init_args)
+
+
+def provided_args(attrs):
+    """Extract the provided arguments from a class's attrs.
+
+    Arguments:
+      attrs (:py:class:`dict`) :The attributes of a class.
+
+    Returns:
+      :py:class:`set`: The provided arguments.
+
+    """
+    return attrs.get('PROVIDED', set())

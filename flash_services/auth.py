@@ -59,22 +59,19 @@ class HeaderMixin(TokenAuthMixin):
         return headers
 
 
-class BasicAuthHeaderMixin(AuthMixin):
+class BasicAuthHeaderMixin(HeaderMixin):
     """Mix-in class for HTTP Basic auth."""
 
-    def __init__(self, *, username, password, **kwargs):
-        self.username = username
-        self.password = password
-        super().__init__(**kwargs)
+    AUTH_HEADER = 'Authorization'
 
-    @property
-    def headers(self):
-        """Get the headers for the service requests."""
+    PROVIDED = {'api_token'}
+
+    def __init__(self, *, username, password, **kwargs):
+        api_token = self._generate_api_token(username, password)
+        super().__init__(api_token=api_token, **kwargs)
+
+    @staticmethod
+    def _generate_api_token(username, password):
         encoding = 'utf8'
-        headers = super().headers
-        token = b64encode(bytes('{}:{}'.format(
-            self.username,
-            self.password
-        ), encoding))
-        headers['Authorization'] = 'Basic {}'.format(str(token, encoding))
-        return headers
+        token = b64encode(bytes('{}:{}'.format(username, password), encoding))
+        return 'Basic {}'.format(str(token, encoding))
