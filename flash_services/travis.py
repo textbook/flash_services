@@ -2,8 +2,6 @@
 
 import logging
 
-import requests
-
 from .auth import HeaderMixin
 from .core import ContinuousIntegrationService
 from .utils import elapsed_time, estimate_time, health_summary
@@ -115,7 +113,6 @@ class TravisPro(HeaderMixin, TravisOS):
 
     """
 
-    AUTH_HEADER = 'Authorization'
     FRIENDLY_NAME = 'Travis CI'
     ROOT = TravisOS.ROOT.replace('.org', '.com')
 

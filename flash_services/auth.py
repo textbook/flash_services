@@ -2,7 +2,6 @@
 # pylint: disable=too-few-public-methods
 
 from base64 import b64encode
-from collections import OrderedDict
 
 from .core import MixinMeta
 
@@ -42,7 +41,7 @@ class UrlParamMixin(TokenAuthMixin):
 class HeaderMixin(TokenAuthMixin):
     """Mix-in class for implementing header authentication."""
 
-    AUTH_HEADER = None
+    AUTH_HEADER = 'Authorization'
     """:py:class:`str`: The name of the request header."""
 
     @property
@@ -56,8 +55,6 @@ class HeaderMixin(TokenAuthMixin):
 class BasicAuthHeaderMixin(HeaderMixin):
     """Mix-in class for HTTP Basic auth."""
 
-    AUTH_HEADER = 'Authorization'
-
     PROVIDED = {'api_token'}
 
     def __init__(self, *, username, password, **kwargs):
@@ -69,3 +66,11 @@ class BasicAuthHeaderMixin(HeaderMixin):
         encoding = 'utf8'
         token = b64encode(bytes('{}:{}'.format(username, password), encoding))
         return 'Basic {}'.format(str(token, encoding))
+
+
+class BearerAuthHeaderMixin(HeaderMixin):
+    """Mix-in class for bearer token authentication."""
+
+    def __init__(self, *, api_token, **kwargs):
+        api_token = 'Bearer {}'.format(api_token)
+        super().__init__(api_token=api_token, **kwargs)

@@ -34,6 +34,13 @@ Available services
 
 The following service definitions include the configuration options:
 
+* ``buddy`` - for CI builds on `Buddy`_
+
+  * ``api_token`` (required - a valid token for the Buddy API)
+  * ``domain`` (required - the domain of the Buddy project)
+  * ``pipeline_id`` (required - the ID of the Buddy pipeline)
+  * ``project_name`` (required - the name of the Buddy project)
+
 * ``codeship`` - for CI builds on `Codeship`_
 
   * ``api_token`` (required)
@@ -155,6 +162,7 @@ validation are supported).
   * in JavaScript (``static/scripts/services.js``, where any service-specific
     client-side behaviour should also be placed).
 
+.. _Buddy: https://buddy.works/
 .. _Codeship: https://codeship.com/
 .. _Coveralls: https://coveralls.io/
 .. _Flash: https://github.com/textbook/flash

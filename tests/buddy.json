@@ -1,0 +1,54 @@
+{
+  "url": "https://api.buddy.works/workspaces/buddy/projects/company-website/pipelines/2/executions",
+  "executions": [
+    {
+      "url": "https://api.buddy.works/workspaces/buddy/projects/company-website/pipelines/2/executions/1",
+      "html_url": "https://app.buddy.works/buddy/company-website/pipelines/pipeline/2/execution/56fa2a981faaf061c7c9e0a0",
+      "id": 1,
+      "start_date": "2016-03-29T07:11:20.278Z",
+      "finish_date": "2016-03-29T07:11:22.527Z",
+      "mode": "MANUAL",
+      "refresh": false,
+      "status": "SUCCESSFUL",
+      "comment": "",
+      "branch": {
+        "url": "https://api.buddy.works/workspaces/buddy/projects/company-website/repository/branches/master",
+        "html_url": "https://app.buddy.works/buddy/company-website/repository/branch/master",
+        "name": "master",
+        "default": true
+      },
+      "to_revision": {
+        "url": "https://api.buddy.works/workspaces/buddy/projects/company-website/repository/commits/506a3963507943d6908154f4bc9646e829128a08",
+        "html_url": "https://app.buddy.works/buddy/company-website/repository/commit/506a3963507943d6908154f4bc9646e829128a08",
+        "revision": "506a3963507943d6908154f4bc9646e829128a08",
+        "author_date": "2016-01-19T12:36:33Z",
+        "commit_date": "2016-01-19T12:36:33Z",
+        "message": "init repo\n",
+        "committer": {
+          "url": "https://api.buddy.works/workspaces/buddy/member/1",
+          "html_url": "https://app.buddy.works/buddy/profile/1",
+          "id": 1,
+          "name": "Mike Benson",
+          "avatar_url": "https://app.buddy.works/image-server/user/0/0/0/0/0/0/1/d643744fbe5ebf2906a4d075a5b97110/w/32/32/AVATAR.png",
+          "title": "Creative director"
+        },
+        "author": {
+          "url": "https://api.buddy.works/workspaces/buddy/member/1",
+          "html_url": "https://app.buddy.works/buddy/profile/1",
+          "id": 1,
+          "name": "Mike Benson",
+          "avatar_url": "https://app.buddy.works/image-server/user/0/0/0/0/0/0/1/d643744fbe5ebf2906a4d075a5b97110/w/32/32/AVATAR.png",
+          "title": "Creative director"
+        }
+      },
+      "creator": {
+        "url": "https://api.buddy.works/workspaces/buddy/member/1",
+        "html_url": "https://app.buddy.works/buddy/profile/1",
+        "id": 1,
+        "name": "Mike Benson",
+        "avatar_url": "https://app.buddy.works/image-server/user/0/0/0/0/0/0/1/d643744fbe5ebf2906a4d075a5b97110/w/32/32/AVATAR.png",
+        "title": "Creative director"
+      }
+    }
+  ]
+}
