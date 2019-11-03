@@ -20,12 +20,6 @@ def buddy_json():
         return json.load(json_file)
 
 
-@pytest.fixture
-def mocked_responses():
-    with responses.RequestsMock() as requests_mock:
-        yield requests_mock
-
-
 def test_buddy_service_type():
     assert issubclass(Buddy, Service)
 
