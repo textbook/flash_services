@@ -16,7 +16,7 @@ from .tracker import Tracker
 from .travis import TravisOS, TravisPro
 
 __author__ = 'Jonathan Sharpe'
-__version__ = '0.9.1'
+__version__ = '0.9.2'
 
 blueprint = Blueprint(
     'services',
@@ -27,6 +27,8 @@ blueprint = Blueprint(
 
 logger = logging.getLogger(__name__)
 
+# pylint: disable=fixme
+# TODO: add services here and in static/scripts/services.js
 SERVICES = dict(
     buddy=Buddy,
     codeship=Codeship,
