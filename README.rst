@@ -145,8 +145,18 @@ validation are supported).
 * Use the mix-ins from ``auth.py`` and ``core.py`` to add any required
   authentication, custom root setting and/or health thresholds;
 
+* Define the ``ROOT`` service URL (used for all requests) and ``ENDPOINT``
+  URL template (which will be filled in with attributes defined on the service
+  instance) - for many cases, the default ``update`` implementation will do
+  what you need it to based on these;
+
 * Define any additional ``REQUIRED`` configuration parameters on the class
-  (required parameters from its superclasses will be added automatically);
+  (note that ``__init__`` keyword arguments without default values and any
+  required parameters defined in superclasses will be added automatically);
+
+* Define any ``PROVIDED`` configuration parameters (i.e. those that other
+  classes require that your class provides - see ``BasicAuthHeaderMixin`` for
+  an example);
 
 * Set the appropriate ``TEMPLATE`` for it (if not a standard template, add it
   to ``templates/partials`` - use the `Jinja2`_ templating language), and note
