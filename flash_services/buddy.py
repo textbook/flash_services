@@ -3,7 +3,7 @@ import logging
 
 from .auth import BearerAuthHeaderMixin
 from .core import ContinuousIntegrationService
-from .utils import elapsed_time, health_summary
+from .utils import elapsed_time, estimate_time, health_summary
 
 logger = logging.getLogger(__name__)
 
@@ -45,8 +45,9 @@ class Buddy(BearerAuthHeaderMixin, ContinuousIntegrationService):
 
         """
         builds = [self.format_build(build) for build in data['executions']]
+        estimate_time(builds)
         return dict(
-            builds=builds,
+            builds=builds[:4],
             health=health_summary(builds),
             name='{0.domain}/{0.project_name} ({0.pipeline_id})'.format(self),
         )

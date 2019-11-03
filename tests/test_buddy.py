@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from unittest import mock
 
 import pytest
 import responses
@@ -33,7 +34,8 @@ def test_correct_config():
     assert Buddy.TEMPLATE == 'ci-section'
 
 
-def test_update_success(service, caplog, mocked_responses, buddy_json):
+@mock.patch('flash_services.buddy.estimate_time')
+def test_update_success(mock_estimate, service, caplog, mocked_responses, buddy_json):
     caplog.set_level(logging.DEBUG)
     mocked_responses.add(
         responses.GET,
@@ -49,17 +51,19 @@ def test_update_success(service, caplog, mocked_responses, buddy_json):
         for record in caplog.records
         if record.levelno == logging.DEBUG
     ]
+    expected_builds = [
+        dict(
+            author='Mike Benson',
+            duration=3,
+            elapsed='took two seconds',
+            message='init repo\n',
+            outcome='passed',
+            started_at=1459235480,
+        ),
+    ]
+    mock_estimate.assert_called_once_with(expected_builds)
     assert result == {
-        'builds': [
-            dict(
-                author='Mike Benson',
-                duration=3,
-                elapsed='took two seconds',
-                message='init repo\n',
-                outcome='passed',
-                started_at=1459235480,
-            ),
-        ],
+        'builds': expected_builds,
         'name': 'bar/baz (123)',
         'health': 'ok'
     }
