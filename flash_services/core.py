@@ -36,8 +36,7 @@ class MixinMeta(type):
           excluding the ``PROVIDED`` configuration keys.
 
         """
-        base_provided = [provided_args(base.__dict__) for base in bases]
-        all_provided = set.union(provided_args(attrs), *base_provided)
+        all_provided = provided_args(attrs)
         attrs['PROVIDED'] = all_provided
         base_required = [required_args(base.__dict__) for base in bases]
         all_required = set.union(required_args(attrs), *base_required)
