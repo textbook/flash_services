@@ -57,7 +57,7 @@ master_doc = 'index'
 # General information about the project.
 project = flash_services.__name__
 author = flash_services.__author__
-copyright = '2016, {}'.format(author)
+copyright = '2016-2019, {}'.format(author)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
