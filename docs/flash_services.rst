@@ -19,6 +19,14 @@ flash_services.auth module
     :undoc-members:
     :show-inheritance:
 
+flash_services.buddy module
+***************************
+
+.. automodule:: flash_services.buddy
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 flash_services.codeship module
 ******************************
 
@@ -34,10 +42,25 @@ flash_services.core module
     :undoc-members:
     :show-inheritance:
 
+flash_services.coveralls module
+*******************************
+.. automodule:: flash_services.coveralls
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 flash_services.github module
 ****************************
 
 .. automodule:: flash_services.github
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+flash_services.jenkins module
+*****************************
+
+.. automodule:: flash_services.jenkins
     :members:
     :undoc-members:
     :show-inheritance:

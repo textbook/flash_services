@@ -228,7 +228,7 @@ TRACKER_STORY = re.compile(r'''
 ''', re.IGNORECASE + re.VERBOSE)
 """Pattern for commit hook story ID format, per `Tracker documentation`_.
 
-.. _Tracker documentation: https://www.pivotaltracker.com/help/api?version=v3#scm_post_commit
+.. _Tracker documentation: https://www.pivotaltracker.com/help/api/rest/v5#Source_Commits
 
 """
 

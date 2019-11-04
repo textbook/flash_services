@@ -2,8 +2,12 @@ Flash Services
 --------------
 
 .. image:: https://img.shields.io/pypi/v/flash_services.svg
-    :target: https://pypi.python.org/pypi/flash_services
-    :alt: PyPI Version
+  :target: https://pypi.python.org/pypi/flash_services
+  :alt: PyPI Version
+
+.. image:: https://readthedocs.org/projects/flash-services/badge/?version=latest
+  :target: https://flash-services.readthedocs.io/en/latest/?badge=latest
+  :alt: Documentation Status
 
 .. image:: https://travis-ci.org/textbook/flash_services.svg?branch=master
   :target: https://travis-ci.org/textbook/flash_services
@@ -27,7 +31,7 @@ update code and any custom templates not available in the core Flash package.
 Documentation
 =============
 
-Documentation is available on PythonHosted_.
+Documentation is available on `Read the Docs`_.
 
 Available services
 ==================
@@ -181,7 +185,7 @@ validation are supported).
 .. _Jenkins: https://jenkins.io/
 .. _Jinja2: http://jinja.pocoo.org/
 .. _Pivotal Tracker: https://www.pivotaltracker.com/
-.. _PythonHosted: https://pythonhosted.org/flash_services
+.. _Read the Docs: https://flash-services.readthedocs.io/en/latest/
 .. _Travis API docs: https://docs.travis-ci.com/api?shell#authentication
 .. _Travis CI (.org): https://travis-ci.org/
 .. _Travis CI (.com): https://travis-ci.com/
