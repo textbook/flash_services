@@ -3,7 +3,6 @@
 import logging
 import re
 from datetime import datetime, timezone
-from enum import Enum
 from inspect import Parameter, Signature
 
 from dateutil.parser import parse
@@ -17,7 +16,7 @@ WORDS = {'1': 'one', '2': 'two', '3': 'three', '4': 'four', '5': 'five',
 NUMBERS = re.compile(r'\b([1-9]|10)\b')
 
 
-class Outcome(str, Enum):
+class Outcome:
     """Possible outcomes for a CI build."""
     WORKING = 'working'
     PASSED = 'passed'
