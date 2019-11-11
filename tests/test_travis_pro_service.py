@@ -33,10 +33,9 @@ def test_correct_headers(service):
     assert service.headers == HEADERS
 
 
-@responses.activate
-def test_update_success(service, caplog):
+def test_update_success(service, caplog, mocked_responses):
     caplog.set_level(logging.DEBUG)
-    responses.add(
+    mocked_responses.add(
         responses.GET,
         'https://api.travis-ci.com/repos/foo/bar/builds',
         json={},
@@ -51,12 +50,11 @@ def test_update_success(service, caplog):
     ]
     assert result == {'builds': [], 'name': 'foo/bar', 'health': 'neutral'}
     for key in HEADERS:
-        assert responses.calls[0].request.headers[key] == HEADERS[key]
+        assert mocked_responses.calls[0].request.headers[key] == HEADERS[key]
 
 
-@responses.activate
-def test_update_failure(service, caplog):
-    responses.add(
+def test_update_failure(service, caplog, mocked_responses):
+    mocked_responses.add(
         responses.GET,
         'https://api.travis-ci.com/repos/foo/bar/builds',
         status=401,
@@ -72,8 +70,7 @@ def test_update_failure(service, caplog):
     assert result == {}
 
 
-@responses.activate
-def test_formatting(service):
+def test_formatting(service, mocked_responses):
     response = dict(
         builds=[dict(
             commit_id=123456,
@@ -87,7 +84,7 @@ def test_formatting(service):
             message='hello world',
         )],
     )
-    responses.add(
+    mocked_responses.add(
         responses.GET,
         'https://api.travis-ci.com/repos/foo/bar/builds',
         json=response,
@@ -109,8 +106,7 @@ def test_formatting(service):
     )
 
 
-@responses.activate
-def test_unfinished_formatting(service, caplog):
+def test_unfinished_formatting(service, caplog, mocked_responses):
     response = dict(
         builds=[dict(
             commit_id=123456,
@@ -122,7 +118,7 @@ def test_unfinished_formatting(service, caplog):
             message='some much longer message',
         )],
     )
-    responses.add(
+    mocked_responses.add(
         responses.GET,
         'https://api.travis-ci.com/repos/foo/bar/builds',
         json=response,

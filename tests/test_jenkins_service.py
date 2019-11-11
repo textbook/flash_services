@@ -36,10 +36,9 @@ def test_correct_config():
     assert Jenkins.TEMPLATE == 'ci-section'
 
 
-@responses.activate
-def test_update_success(service, url, caplog):
+def test_update_success(service, url, caplog, mocked_responses):
     caplog.set_level(logging.DEBUG)
-    responses.add(
+    mocked_responses.add(
         responses.GET,
         url,
         headers={'Authorization': 'Basic Zm9vOmJhcg=='},
@@ -56,9 +55,8 @@ def test_update_success(service, url, caplog):
     assert result == {'builds': [], 'name': 'baz', 'health': 'neutral'}
 
 
-@responses.activate
-def test_update_failure(service, url, caplog):
-    responses.add(responses.GET, url, status=401)
+def test_update_failure(service, url, caplog, mocked_responses):
+    mocked_responses.add(responses.GET, url, status=401)
 
     result = service.update()
 
@@ -70,8 +68,7 @@ def test_update_failure(service, url, caplog):
     assert result == {}
 
 
-@responses.activate
-def test_formatting(service, url):
+def test_formatting(service, url, mocked_responses):
     response = dict(name='job', builds=[
         dict(
             duration=31698,
@@ -85,7 +82,7 @@ def test_formatting(service, url):
             ]
         )
     ])
-    responses.add(responses.GET, url, json=response)
+    mocked_responses.add(responses.GET, url, json=response)
 
     result = service.update()
 
@@ -103,8 +100,7 @@ def test_formatting(service, url):
     )
 
 
-@responses.activate
-def test_aborted_formatting(service, url):
+def test_aborted_formatting(service, url, mocked_responses):
     response = dict(
         name='job',
         builds=[dict(
@@ -114,7 +110,7 @@ def test_aborted_formatting(service, url):
             result='ABORTED',
         )],
     )
-    responses.add(responses.GET, url, json=response)
+    mocked_responses.add(responses.GET, url, json=response)
 
     result = service.update()
 
@@ -132,9 +128,8 @@ def test_aborted_formatting(service, url):
     )
 
 
-@responses.activate
 @freeze_time(datetime.fromtimestamp(1481387969.3))
-def test_unfinished_formatting(service, url):
+def test_unfinished_formatting(service, url, mocked_responses):
     response = dict(
         name='foo',
         builds=[dict(
@@ -146,7 +141,7 @@ def test_unfinished_formatting(service, url):
             changeSets=[],
         )],
     )
-    responses.add(responses.GET, url, json=response)
+    mocked_responses.add(responses.GET, url, json=response)
 
     result = service.update()
 
@@ -165,8 +160,7 @@ def test_unfinished_formatting(service, url):
 
 
 @freeze_time(datetime.fromtimestamp(1481387969))
-@responses.activate
-def test_estimated_formatting(service, url):
+def test_estimated_formatting(service, url, mocked_responses):
     response = dict(name='foo', builds=[
         dict(duration=0, description=None, timestamp=1481387964313, result=None),
         dict(duration=10000, description=None, timestamp=1481387964313, result='SUCCESS'),
@@ -175,7 +169,7 @@ def test_estimated_formatting(service, url):
         dict(duration=10000, description=None, timestamp=1481387964313, result='SUCCESS'),
         dict(duration=10000, description=None, timestamp=1481387964313, result='SUCCESS'),
     ])
-    responses.add(responses.GET, url, json=response)
+    mocked_responses.add(responses.GET, url, json=response)
 
     result = service.update()
 

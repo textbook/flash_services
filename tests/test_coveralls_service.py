@@ -28,9 +28,8 @@ def test_repo_name(service):
     (dict(covered_percent=None), 'error'),
     (dict(), 'error'),
 ])
-@responses.activate
-def test_health(build, outcome, service):
-    responses.add(
+def test_health(build, outcome, service, mocked_responses):
+    mocked_responses.add(
         responses.GET,
         'https://coveralls.io/foo/bar/baz.json?page=1',
         json=dict(builds=[build])
@@ -46,9 +45,8 @@ TWO_DAYS_AGO = (datetime.now() - timedelta(days=2, hours=12)).strftime(
 )
 
 
-@responses.activate
-def test_update(service):
-    responses.add(
+def test_update(service, mocked_responses):
+    mocked_responses.add(
         responses.GET,
         'https://coveralls.io/foo/bar/baz.json?page=1',
         json=dict(
@@ -76,9 +74,8 @@ def test_update(service):
     )
 
 
-@responses.activate
-def test_format_build_missing_data(service):
-    responses.add(
+def test_format_build_missing_data(service, mocked_responses):
+    mocked_responses.add(
         responses.GET,
         'https://coveralls.io/foo/bar/baz.json?page=1',
         json=dict(builds=[{}]),
@@ -95,9 +92,8 @@ def test_format_build_missing_data(service):
     )
 
 
-@responses.activate
-def test_update_failure(service, caplog):
-    responses.add(
+def test_update_failure(service, caplog, mocked_responses):
+    mocked_responses.add(
         responses.GET,
         'https://coveralls.io/foo/bar/baz.json?page=1',
         status=401,

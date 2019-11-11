@@ -43,10 +43,9 @@ TWO_DAYS_AGO = (datetime.now() - timedelta(days=2, hours=12)).strftime(
 )
 
 
-@responses.activate
-def test_update_success(service, caplog):
+def test_update_success(service, caplog, mocked_responses):
     caplog.set_level(logging.DEBUG)
-    responses.add(
+    mocked_responses.add(
         responses.GET,
         'https://api.github.com/repos/foo/bar/commits?access_token=foobar',
         json=[{'commit': {
@@ -68,13 +67,12 @@ def test_update_success(service, caplog):
         'author': 'alice [bob]',
         'committed': 'two days ago'
     }], 'name': 'foo/bar'}
-    assert responses.calls[0].request.headers['User-Agent'] == 'bar'
+    assert mocked_responses.calls[0].request.headers['User-Agent'] == 'bar'
 
 
-@responses.activate
-def test_update_enterprise_success(caplog):
+def test_update_enterprise_success(caplog, mocked_responses):
     caplog.set_level(logging.DEBUG)
-    responses.add(
+    mocked_responses.add(
         responses.GET,
         'http://dummy.url/repos/foo/bar/commits?access_token=foobar',
         json=[{'commit': {
@@ -99,12 +97,11 @@ def test_update_enterprise_success(caplog):
         'author': 'alice [bob]',
         'committed': 'two days ago'
     }], 'name': 'foo/bar'}
-    assert responses.calls[0].request.headers['User-Agent'] == 'bar'
+    assert mocked_responses.calls[0].request.headers['User-Agent'] == 'bar'
 
 
-@responses.activate
-def test_update_failure(service, caplog):
-    responses.add(
+def test_update_failure(service, caplog, mocked_responses):
+    mocked_responses.add(
         responses.GET,
         'https://api.github.com/repos/foo/bar/commits?access_token=foobar',
         status=401,
@@ -118,7 +115,7 @@ def test_update_failure(service, caplog):
         if record.levelno == logging.ERROR
     ]
     assert result == {}
-    assert responses.calls[0].request.headers['User-Agent'] == 'bar'
+    assert mocked_responses.calls[0].request.headers['User-Agent'] == 'bar'
 
 
 @pytest.mark.parametrize('commit, expected', [
@@ -152,9 +149,8 @@ def test_update_failure(service, caplog):
         ),
     ),
 ])
-@responses.activate
-def test_format_commit(service, commit, expected):
-    responses.add(
+def test_format_commit(service, commit, expected, mocked_responses):
+    mocked_responses.add(
         responses.GET,
         'https://api.github.com/repos/foo/bar/commits?access_token=foobar',
         json=[dict(commit=commit)],
@@ -163,12 +159,11 @@ def test_format_commit(service, commit, expected):
     result = service.update()
 
     assert result['commits'][0] == expected
-    assert responses.calls[0].request.headers['User-Agent'] == 'bar'
+    assert mocked_responses.calls[0].request.headers['User-Agent'] == 'bar'
 
 
-@responses.activate
-def test_branch_url(branched):
-    responses.add(
+def test_branch_url(branched, mocked_responses):
+    mocked_responses.add(
         responses.GET,
         'https://api.github.com/repos/foo/bar/commits?sha=baz&access_token=foobar',
         status=302,
@@ -176,4 +171,4 @@ def test_branch_url(branched):
 
     branched.update()
 
-    assert responses.calls[0].request.headers['User-Agent'] == 'bar'
+    assert mocked_responses.calls[0].request.headers['User-Agent'] == 'bar'

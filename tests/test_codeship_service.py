@@ -23,10 +23,9 @@ def test_correct_config():
     assert Codeship.TEMPLATE == 'ci-section'
 
 
-@responses.activate
-def test_update_success(service, caplog):
+def test_update_success(service, caplog, mocked_responses):
     caplog.set_level(logging.DEBUG)
-    responses.add(
+    mocked_responses.add(
         responses.GET,
         'https://codeship.com/api/v1/projects/123.json?api_key=foobar',
         json={'repository_name': 'bar'},
@@ -42,9 +41,8 @@ def test_update_success(service, caplog):
     assert result == {'builds': [], 'name': 'bar', 'health': 'neutral'}
 
 
-@responses.activate
-def test_update_failure(service, caplog):
-    responses.add(
+def test_update_failure(service, caplog, mocked_responses):
+    mocked_responses.add(
         responses.GET,
         'https://codeship.com/api/v1/projects/123.json?api_key=foobar',
         status=401,
@@ -60,9 +58,8 @@ def test_update_failure(service, caplog):
     assert result == {}
 
 
-@responses.activate
-def test_formatting(service):
-    responses.add(
+def test_formatting(service, mocked_responses):
+    mocked_responses.add(
         responses.GET,
         'https://codeship.com/api/v1/projects/123.json?api_key=foobar',
         json=(dict(
@@ -93,9 +90,8 @@ def test_formatting(service):
     )
 
 
-@responses.activate
-def test_unfinished_formatting(service, caplog):
-    responses.add(
+def test_unfinished_formatting(service, caplog, mocked_responses):
+    mocked_responses.add(
         responses.GET,
         'https://codeship.com/api/v1/projects/123.json?api_key=foobar',
         json=(dict(

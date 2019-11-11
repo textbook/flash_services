@@ -32,10 +32,9 @@ def test_correct_enterprise_config():
     assert GitHubEnterpriseIssues.TEMPLATE == 'gh-issues-section'
 
 
-@responses.activate
-def test_update_success(service, caplog):
+def test_update_success(service, caplog, mocked_responses):
     caplog.set_level(logging.DEBUG)
-    responses.add(
+    mocked_responses.add(
         responses.GET,
         'https://api.github.com/repos/foo/bar/issues?state=all&access_token=foobar',
         headers={'User-Agent': 'bar'},
@@ -52,10 +51,9 @@ def test_update_success(service, caplog):
     assert result == {'issues': {}, 'name': 'foo/bar', 'health': 'neutral', 'halflife': None}
 
 
-@responses.activate
-def test_update_enterprise_success(caplog):
+def test_update_enterprise_success(caplog, mocked_responses):
     caplog.set_level(logging.DEBUG)
-    responses.add(
+    mocked_responses.add(
         responses.GET,
         'http://dummy.url/repos/foo/bar/issues?state=all&access_token=foobar',
         headers={'User-Agent': 'bar'},
@@ -78,14 +76,12 @@ def test_update_enterprise_success(caplog):
     assert result == {'issues': {}, 'name': 'foo/bar', 'health': 'neutral', 'halflife': None}
 
 
-@responses.activate
-def test_update_failure(service, caplog):
-    responses.add(
+def test_update_failure(service, caplog, mocked_responses):
+    mocked_responses.add(
         responses.GET,
         'https://api.github.com/repos/foo/bar/issues?state=all&access_token=foobar',
         headers={'User-Agent': 'bar'},
         status=401,
-
     )
 
     result = service.update()
@@ -155,16 +151,15 @@ def test_update_failure(service, caplog):
         ),
     ),
 ])
-@responses.activate
-def test_format_data(payload, expected, service):
-    responses.add(
+def test_format_data(payload, expected, service, mocked_responses):
+    mocked_responses.add(
         responses.GET,
         'https://api.github.com/repos/foo/bar/issues?state=all&access_token=foobar',
         json=payload,
     )
 
     assert service.update() == expected
-    assert responses.calls[0].request.headers['User-Agent'] == 'bar'
+    assert mocked_responses.calls[0].request.headers['User-Agent'] == 'bar'
 
 
 def test_adjust_threshold():

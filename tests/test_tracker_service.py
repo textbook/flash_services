@@ -26,9 +26,8 @@ def test_headers(service):
     assert service.headers == {'X-TrackerToken': 'foobar'}
 
 
-@responses.activate
-def test_get_velocity_success(service):
-    responses.add(
+def test_get_velocity_success(service, mocked_responses):
+    mocked_responses.add(
         responses.GET,
         'https://www.pivotaltracker.com/services/v5/projects/123/iterations'
         '/456?fields=%3Adefault%2Cvelocity%2Cstories',
@@ -44,16 +43,15 @@ def test_get_velocity_success(service):
     result = service.details(456)
 
     assert result == {'velocity': 10, 'stories': {'foo': 5}}
-    assert responses.calls[0].request.headers['X-TrackerToken'] == 'foobar'
+    assert mocked_responses.calls[0].request.headers['X-TrackerToken'] == 'foobar'
 
 
-@responses.activate
-def test_update_success(service, caplog):
+def test_update_success(service, caplog, mocked_responses):
     caplog.set_level(logging.DEBUG)
     service.current_iteration = 1
     service.project_version = 2
     service._cached = {'foo': 'bar'}
-    responses.add(
+    mocked_responses.add(
         responses.GET,
         'https://www.pivotaltracker.com/services/v5/projects/123',
         json={'foo': 'bar', 'current_iteration_number': 0},
@@ -68,12 +66,11 @@ def test_update_success(service, caplog):
         if record.levelno == logging.DEBUG
     ]
     assert result == {'foo': 'bar'}
-    assert responses.calls[0].request.headers['X-TrackerToken'] == 'foobar'
+    assert mocked_responses.calls[0].request.headers['X-TrackerToken'] == 'foobar'
 
 
-@responses.activate
-def test_get_velocity_failure(service, caplog):
-    responses.add(
+def test_get_velocity_failure(service, caplog, mocked_responses):
+    mocked_responses.add(
         responses.GET,
         'https://www.pivotaltracker.com/services/v5/projects/123/iterations'
         '/456?fields=%3Adefault%2Cvelocity%2Cstories',
@@ -88,12 +85,11 @@ def test_get_velocity_failure(service, caplog):
         if record.levelno == logging.ERROR
     ]
     assert result == {}
-    assert responses.calls[0].request.headers['X-TrackerToken'] == 'foobar'
+    assert mocked_responses.calls[0].request.headers['X-TrackerToken'] == 'foobar'
 
 
-@responses.activate
-def test_update_failure(service, caplog):
-    responses.add(
+def test_update_failure(service, caplog, mocked_responses):
+    mocked_responses.add(
         responses.GET,
         'https://www.pivotaltracker.com/services/v5/projects/123',
         status=401,
@@ -107,23 +103,22 @@ def test_update_failure(service, caplog):
         if record.levelno == logging.ERROR
     ]
     assert result == {}
-    assert responses.calls[0].request.headers['X-TrackerToken'] == 'foobar'
+    assert mocked_responses.calls[0].request.headers['X-TrackerToken'] == 'foobar'
 
 
-@responses.activate
-def test_update_details(service, caplog):
+def test_update_details(service, caplog, mocked_responses):
     caplog.set_level(logging.DEBUG)
     service.current_iteration = 1
     service.project_version = 1
     service._cached = {'foo': 'bar'}
     name = 'foo'
-    responses.add(
+    mocked_responses.add(
         responses.GET,
         'https://www.pivotaltracker.com/services/v5/projects/123',
         json={'current_iteration_number': 1, 'name': name},
         adding_headers={'X-Tracker-Project-Version': '2'},
     )
-    responses.add(
+    mocked_responses.add(
         responses.GET,
         'https://www.pivotaltracker.com/services/v5/projects/123/iterations'
         '/1?fields=%3Adefault%2Cvelocity%2Cstories',
@@ -148,21 +143,21 @@ def test_update_details(service, caplog):
     (2, 1, True),
     (2, 2, True),
 ])
-@responses.activate
-def test_update_cache(service, version, iteration, get_details):
+def test_update_cache(service, version, iteration, get_details, mocked_responses):
     name = 'foo'
-    responses.add(
+    mocked_responses.add(
         responses.GET,
         'https://www.pivotaltracker.com/services/v5/projects/123',
         adding_headers={'X-Tracker-Project-Version': str(version)},
         json={'current_iteration_number': iteration, 'name': name},
     )
-    responses.add(
-        responses.GET,
-        'https://www.pivotaltracker.com/services/v5/projects/123/iterations'
-        '/{}?fields=%3Adefault%2Cvelocity%2Cstories'.format(iteration),
-        json={},
-    )
+    if get_details:
+        mocked_responses.add(
+            responses.GET,
+            'https://www.pivotaltracker.com/services/v5/projects/123/iterations'
+            '/{}?fields=%3Adefault%2Cvelocity%2Cstories'.format(iteration),
+            json={},
+        )
     service._cached = {}
     service.current_iteration = 1
     service.project_version = 1
@@ -170,8 +165,8 @@ def test_update_cache(service, version, iteration, get_details):
     result = service.update()
 
     if get_details:
-        assert len(responses.calls) == 2
+        assert len(mocked_responses.calls) == 2
         assert result == dict(name=name, velocity='unknown', stories={})
     else:
-        assert len(responses.calls) == 1
+        assert len(mocked_responses.calls) == 1
         assert result is service._cached
