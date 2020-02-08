@@ -9,7 +9,7 @@ from flash_services.github import GitHubEnterpriseIssues, GitHubIssues
 
 @pytest.fixture
 def service():
-    return GitHubIssues(api_token='foobar', account='foo', repo='bar')
+    return GitHubIssues(username='user', password='foobar', account='foo', repo='bar')
 
 
 def test_tracker_service_type():
@@ -17,17 +17,15 @@ def test_tracker_service_type():
 
 
 def test_correct_config():
-    assert GitHubIssues.AUTH_PARAM == 'access_token'
     assert GitHubIssues.FRIENDLY_NAME == 'GitHub Issues'
-    assert GitHubIssues.REQUIRED == {'api_token', 'account', 'repo'}
+    assert GitHubIssues.REQUIRED == {'username', 'password', 'account', 'repo'}
     assert GitHubIssues.ROOT == 'https://api.github.com'
     assert GitHubIssues.TEMPLATE == 'gh-issues-section'
 
 
 def test_correct_enterprise_config():
-    assert GitHubEnterpriseIssues.AUTH_PARAM == 'access_token'
     assert GitHubEnterpriseIssues.FRIENDLY_NAME == 'GitHub Issues'
-    assert GitHubEnterpriseIssues.REQUIRED == {'api_token', 'account', 'repo', 'root'}
+    assert GitHubEnterpriseIssues.REQUIRED == {'username', 'password', 'account', 'repo', 'root'}
     assert GitHubEnterpriseIssues.ROOT == ''
     assert GitHubEnterpriseIssues.TEMPLATE == 'gh-issues-section'
 
@@ -36,7 +34,7 @@ def test_update_success(service, caplog, mocked_responses):
     caplog.set_level(logging.DEBUG)
     mocked_responses.add(
         responses.GET,
-        'https://api.github.com/repos/foo/bar/issues?state=all&access_token=foobar',
+        'https://api.github.com/repos/foo/bar/issues?state=all',
         headers={'User-Agent': 'bar'},
         json=[],
     )
@@ -55,12 +53,13 @@ def test_update_enterprise_success(caplog, mocked_responses):
     caplog.set_level(logging.DEBUG)
     mocked_responses.add(
         responses.GET,
-        'http://dummy.url/repos/foo/bar/issues?state=all&access_token=foobar',
+        'http://dummy.url/repos/foo/bar/issues?state=all',
         headers={'User-Agent': 'bar'},
         json=[],
     )
     service = GitHubEnterpriseIssues(
-        api_token='foobar',
+        username='enterprise-user',
+        password='foobar',
         account='foo',
         repo='bar',
         root='http://dummy.url',
@@ -79,7 +78,7 @@ def test_update_enterprise_success(caplog, mocked_responses):
 def test_update_failure(service, caplog, mocked_responses):
     mocked_responses.add(
         responses.GET,
-        'https://api.github.com/repos/foo/bar/issues?state=all&access_token=foobar',
+        'https://api.github.com/repos/foo/bar/issues?state=all',
         headers={'User-Agent': 'bar'},
         status=401,
     )
@@ -154,7 +153,7 @@ def test_update_failure(service, caplog, mocked_responses):
 def test_format_data(payload, expected, service, mocked_responses):
     mocked_responses.add(
         responses.GET,
-        'https://api.github.com/repos/foo/bar/issues?state=all&access_token=foobar',
+        'https://api.github.com/repos/foo/bar/issues?state=all',
         json=payload,
     )
 
@@ -163,7 +162,7 @@ def test_format_data(payload, expected, service, mocked_responses):
 
 
 def test_adjust_threshold():
-    service = GitHubIssues(ok_threshold=1, account='', repo='', api_token='')
+    service = GitHubIssues(ok_threshold=1, account='', repo='', username='', password='')
     assert service.ok_threshold == 1
     assert service.neutral_threshold == 30
     issues = [

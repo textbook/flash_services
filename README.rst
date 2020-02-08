@@ -66,7 +66,8 @@ The following service definitions include the configuration options:
 
 * ``gh_issues`` - for issues and PRs in project repositories on `GitHub`_
 
-  * ``api_token`` (required),
+  * ``password`` (required - a GitHub API token)
+  * ``username`` (required - the username for the token)
   * ``account`` (required - the name of the account the project is in, e.g.
     ``"textbook"``)
   * ``repo`` (required - the name of the project repository within that account,
@@ -79,7 +80,8 @@ The following service definitions include the configuration options:
 * ``ghe_issues`` - for issues and PRs in project repositories on
   `GitHub Enterprise`_ installations
 
-  * ``api_token`` (required),
+  * ``password`` (required - a GitHub API token)
+  * ``username`` (required - the username for the token)
   * ``account`` (required - the name of the account the project is in, e.g.
     ``"textbook"``)
   * ``repo`` (required - the name of the project repository within that account,
@@ -91,7 +93,8 @@ The following service definitions include the configuration options:
 
 * ``github`` - for project repositories on `GitHub`_
 
-  * ``api_token`` (required),
+  * ``password`` (required - a GitHub API token)
+  * ``username`` (required - the username for the token)
   * ``account`` (required - the name of the account the project is in, e.g.
     ``"textbook"``)
   * ``repo`` (required - the name of the project repository within that account,
@@ -102,7 +105,8 @@ The following service definitions include the configuration options:
 * ``github_enterprise`` - for project repositories on `GitHub Enterprise`_
   installations
 
-  * ``api_token`` (required),
+  * ``password`` (required - a GitHub API token)
+  * ``username`` (required - the username for the token)
   * ``account`` (required - the name of the account the project is in, e.g.
     ``"textbook"``)
   * ``repo`` (required - the name of the project repository within that account,

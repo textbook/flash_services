@@ -10,12 +10,12 @@ from flash_services.github import GitHub, GitHubEnterprise
 
 @pytest.fixture
 def service():
-    return GitHub(api_token='foobar', account='foo', repo='bar')
+    return GitHub(username='janedoe', password='foobar', account='foo', repo='bar')
 
 
 @pytest.fixture
 def branched():
-    return GitHub(api_token='foobar', account='foo', repo='bar', branch='baz')
+    return GitHub(username='janedoe', password='foobar', account='foo', repo='bar', branch='baz')
 
 
 def test_tracker_service_type():
@@ -23,17 +23,15 @@ def test_tracker_service_type():
 
 
 def test_correct_config():
-    assert GitHub.AUTH_PARAM == 'access_token'
     assert GitHub.FRIENDLY_NAME == 'GitHub'
-    assert GitHub.REQUIRED == {'api_token', 'account', 'repo'}
+    assert GitHub.REQUIRED == {'username', 'password', 'account', 'repo'}
     assert GitHub.ROOT == 'https://api.github.com'
     assert GitHub.TEMPLATE == 'vcs-section'
 
 
 def test_correct_enterprise_config():
-    assert GitHubEnterprise.AUTH_PARAM == 'access_token'
     assert GitHubEnterprise.FRIENDLY_NAME == 'GitHub'
-    assert GitHubEnterprise.REQUIRED == {'api_token', 'account', 'repo', 'root'}
+    assert GitHubEnterprise.REQUIRED == {'username', 'password', 'account', 'repo', 'root'}
     assert GitHubEnterprise.ROOT == ''
     assert GitHubEnterprise.TEMPLATE == 'vcs-section'
 
@@ -47,7 +45,7 @@ def test_update_success(service, caplog, mocked_responses):
     caplog.set_level(logging.DEBUG)
     mocked_responses.add(
         responses.GET,
-        'https://api.github.com/repos/foo/bar/commits?access_token=foobar',
+        'https://api.github.com/repos/foo/bar/commits',
         json=[{'commit': {
             'author': {'name': 'alice'},
             'committer': {'name': 'bob', 'date': TWO_DAYS_AGO},
@@ -67,14 +65,16 @@ def test_update_success(service, caplog, mocked_responses):
         'author': 'alice [bob]',
         'committed': 'two days ago'
     }], 'name': 'foo/bar'}
-    assert mocked_responses.calls[0].request.headers['User-Agent'] == 'bar'
+    headers = mocked_responses.calls[0].request.headers
+    assert headers['User-Agent'] == 'bar'
+    assert headers['Authorization'] == 'Basic amFuZWRvZTpmb29iYXI='
 
 
 def test_update_enterprise_success(caplog, mocked_responses):
     caplog.set_level(logging.DEBUG)
     mocked_responses.add(
         responses.GET,
-        'http://dummy.url/repos/foo/bar/commits?access_token=foobar',
+        'http://dummy.url/repos/foo/bar/commits',
         json=[{'commit': {
             'author': {'name': 'alice'},
             'committer': {'name': 'bob', 'date': TWO_DAYS_AGO},
@@ -82,7 +82,8 @@ def test_update_enterprise_success(caplog, mocked_responses):
         }}],
     )
 
-    service = GitHubEnterprise(api_token='foobar', account='foo', repo='bar',
+    service = GitHubEnterprise(username='johndoe', password='foobar',
+                               account='foo', repo='bar',
                                root='http://dummy.url')
 
     result = service.update()
@@ -103,7 +104,7 @@ def test_update_enterprise_success(caplog, mocked_responses):
 def test_update_failure(service, caplog, mocked_responses):
     mocked_responses.add(
         responses.GET,
-        'https://api.github.com/repos/foo/bar/commits?access_token=foobar',
+        'https://api.github.com/repos/foo/bar/commits',
         status=401,
     )
 
@@ -152,7 +153,7 @@ def test_update_failure(service, caplog, mocked_responses):
 def test_format_commit(service, commit, expected, mocked_responses):
     mocked_responses.add(
         responses.GET,
-        'https://api.github.com/repos/foo/bar/commits?access_token=foobar',
+        'https://api.github.com/repos/foo/bar/commits',
         json=[dict(commit=commit)],
     )
 
@@ -165,7 +166,7 @@ def test_format_commit(service, commit, expected, mocked_responses):
 def test_branch_url(branched, mocked_responses):
     mocked_responses.add(
         responses.GET,
-        'https://api.github.com/repos/foo/bar/commits?sha=baz&access_token=foobar',
+        'https://api.github.com/repos/foo/bar/commits?sha=baz',
         status=302,
     )
 

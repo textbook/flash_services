@@ -4,14 +4,14 @@ import logging
 from collections import defaultdict
 from datetime import timedelta
 
-from .auth import UrlParamMixin
+from .auth import BasicAuthHeaderMixin
 from .core import CustomRootMixin, ThresholdMixin, VersionControlService
 from .utils import naturaldelta, occurred, safe_parse
 
 logger = logging.getLogger(__name__)
 
 
-class GitHub(UrlParamMixin, VersionControlService):
+class GitHub(BasicAuthHeaderMixin, VersionControlService):
     """Show the current status of a GitHub repository.
 
     Arguments:
@@ -27,7 +27,6 @@ class GitHub(UrlParamMixin, VersionControlService):
 
     """
 
-    AUTH_PARAM = 'access_token'
     ENDPOINT = '/repos/{repo_name}/commits'
     ROOT = 'https://api.github.com'
 
