@@ -45,6 +45,18 @@ The following service definitions include the configuration options:
   * ``pipeline_id`` (required - the ID of the Buddy pipeline)
   * ``project_name`` (required - the name of the Buddy project)
 
+* ``circleci`` - for CI builds on `CircleCI`_
+
+  * ``api_token`` (required - a valid token for the Circle CI API)
+  * ``vcs_type`` (required - the name of the service the project is accessed
+    via, e.g. ``'github'``)
+  * ``username`` (required - the name of the account the project is in, e.g.
+    ``"textbook"``)
+  * ``project`` (required - the name of the project repository within that
+    account, e.g. ``"flash"``)
+  * ``branch`` (required - the name of the branch to show builds from, e.g.
+    ``"main"``)
+
 * ``codeship`` - for CI builds on `Codeship`_
 
   * ``api_token`` (required)
@@ -181,6 +193,7 @@ validation are supported).
     client-side behaviour should also be placed).
 
 .. _Buddy: https://buddy.works/
+.. _CircleCI: https://circleci.com/
 .. _Codeship: https://codeship.com/
 .. _Coveralls: https://coveralls.io/
 .. _Flash: https://github.com/textbook/flash
