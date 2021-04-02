@@ -1,5 +1,6 @@
 from .auth import HeaderMixin
 from .core import ContinuousIntegrationService
+from .utils import elapsed_time, estimate_time, health_summary, Outcome
 
 
 class CircleCI(HeaderMixin, ContinuousIntegrationService):
@@ -17,6 +18,21 @@ class CircleCI(HeaderMixin, ContinuousIntegrationService):
 
     AUTH_HEADER = 'Circle-Token'
     ENDPOINT = '/project/{vcs_type}/{username}/{project}/tree/{branch}'
+    OUTCOMES = dict(
+        retried=Outcome.CANCELLED,
+        canceled=Outcome.CANCELLED,
+        infrastructure_fail=Outcome.CRASHED,
+        timedout=Outcome.CRASHED,
+        not_run=Outcome.CANCELLED,
+        running=Outcome.WORKING,
+        failed=Outcome.FAILED,
+        queued=Outcome.WORKING,
+        scheduled=Outcome.WORKING,
+        not_running=Outcome.WORKING,
+        no_tests=Outcome.CRASHED,
+        fixed=Outcome.PASSED,
+        success=Outcome.PASSED
+    )
     ROOT = 'https://circleci.com/api/v1.1'
 
     def __init__(self, *, vcs_type, username, project, branch, **kwargs):
@@ -41,7 +57,21 @@ class CircleCI(HeaderMixin, ContinuousIntegrationService):
 
     @classmethod
     def format_build(cls, build):
-        pass
+        start, finish, elapsed = elapsed_time(
+            build.get('start_time'),
+            build.get('stop_time'),
+        )
+        duration = None if start is None or finish is None else finish - start
+        return super().format_build(dict(
+            author=build.get('committer_name'),
+            duration=duration,
+            elapsed=elapsed,
+            message=build.get('subject'),
+            outcome=build.get('status'),
+            started_at=start,
+        ))
 
     def format_data(self, data):
-        return dict(name=self._name, builds=[], health='neutral')
+        builds = [self.format_build(build) for build in data]
+        estimate_time(builds)
+        return dict(name=self._name, builds=builds[:4], health=health_summary(builds))
