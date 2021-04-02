@@ -3,6 +3,17 @@ from .core import ContinuousIntegrationService
 
 
 class CircleCI(HeaderMixin, ContinuousIntegrationService):
+    """Show the current build status on Circle CI.
+
+    Arguments:
+      api_token (:py:class:`str`): A valid token for the Circle CI API.
+      branch (:py:class:`str`): The name of the branch.
+      project (:py:class:`str`): The name of the project/repo.
+      username (:py:class:`str`): The name of the user/org.
+      vcs_type (:py:class:`str`): Which version control system type the
+        project uses.
+
+    """
 
     AUTH_HEADER = 'Circle-Token'
     ENDPOINT = '/project/{vcs_type}/{username}/{project}/tree/{branch}'
