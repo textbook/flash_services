@@ -26,6 +26,7 @@ function github(pane, data) {
 // TODO: add services here and in __init__.py
 var SERVICES = {
   buddy: builds,
+  circleci: builds,
   codeship: builds,
   coveralls: function (pane, data) {
     if (data.builds) {
