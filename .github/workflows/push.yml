@@ -20,9 +20,9 @@ jobs:
       - run: pip install -r requirements.txt
       - run: pip install coveralls
       - run: coverage run --source=flash_services setup.py test
-      - uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: coveralls
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   deploy:
     runs-on: ubuntu-18.04
     if: startsWith(github.ref, 'refs/tags/v')
