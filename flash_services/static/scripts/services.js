@@ -39,6 +39,8 @@ var SERVICES = {
   },
   gh_issues: gh_issues,
   ghe_issues: gh_issues,
+  gh_actions: builds,
+  ghe_actions: builds,
   github: github,
   github_enterprise: github,
   jenkins: builds,

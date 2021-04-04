@@ -92,6 +92,7 @@ The following service definitions include the configuration options:
 * ``ghe_issues`` - for issues and PRs in project repositories on
   `GitHub Enterprise`_ installations
 
+  * ``root`` (required - the root URL for the enterprise API)
   * ``password`` (required - a GitHub API token)
   * ``username`` (required - the username for the token)
   * ``account`` (required - the name of the account the project is in, e.g.
@@ -102,6 +103,26 @@ The following service definitions include the configuration options:
     in days, defaults to 30)
   * ``ok_threshold`` (the maximum half life to show as an OK state, in days,
     defaults to 7)
+
+* ``gh_actions`` - for Actions in project repositories on `GitHub`_
+
+  * ``password`` (required - a GitHub API token)
+  * ``username`` (required - the username for the token)
+  * ``account`` (required - the name of the account the project is in, e.g.
+    ``"textbook"``)
+  * ``repo`` (required - the name of the project repository within that account,
+    e.g. ``"flash"``)
+
+* ``ghe_actions`` - for Actions in project repositories on `GitHub Enterprise`_
+  installations
+
+  * ``root`` (required - the root URL for the enterprise API)
+  * ``password`` (required - a GitHub API token)
+  * ``username`` (required - the username for the token)
+  * ``account`` (required - the name of the account the project is in, e.g.
+    ``"textbook"``)
+  * ``repo`` (required - the name of the project repository within that account,
+    e.g. ``"flash"``)
 
 * ``github`` - for project repositories on `GitHub`_
 
@@ -117,6 +138,7 @@ The following service definitions include the configuration options:
 * ``github_enterprise`` - for project repositories on `GitHub Enterprise`_
   installations
 
+  * ``root`` (required - the root URL for the enterprise API)
   * ``password`` (required - a GitHub API token)
   * ``username`` (required - the username for the token)
   * ``account`` (required - the name of the account the project is in, e.g.

@@ -5,8 +5,8 @@ from collections import defaultdict
 from datetime import timedelta
 
 from .auth import BasicAuthHeaderMixin
-from .core import CustomRootMixin, ThresholdMixin, VersionControlService
-from .utils import naturaldelta, occurred, safe_parse
+from .core import ContinuousIntegrationService, CustomRootMixin, ThresholdMixin, VersionControlService
+from .utils import elapsed_time, estimate_time, health_summary, naturaldelta, occurred, Outcome, safe_parse
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +46,7 @@ class GitHub(BasicAuthHeaderMixin, VersionControlService):
     @property
     def headers(self):
         headers = super().headers
+        headers['Accept'] = 'application/vnd.github.v3+json'
         headers['User-Agent'] = self.repo
         return headers
 
@@ -177,6 +178,54 @@ class GitHubIssues(ThresholdMixin, GitHub):
         return 'error'
 
 
+class GitHubActions(GitHub, ContinuousIntegrationService):
+    """Show the current build status on GitHub Actions."""
+
+    ENDPOINT = '/repos/{repo_name}/actions/runs'
+    FRIENDLY_NAME = 'GitHub Actions'
+    OUTCOMES = dict(
+        action_required=Outcome.CRASHED,
+        cancelled=Outcome.CANCELLED,
+        failure=Outcome.FAILED,
+        in_progress=Outcome.WORKING,
+        neutral=Outcome.PASSED,
+        queued=Outcome.WORKING,
+        skipped=Outcome.CANCELLED,
+        stale=Outcome.CRASHED,
+        success=Outcome.PASSED,
+        timed_out=Outcome.CRASHED,
+    )
+
+    @property
+    def url_params(self):
+        params = super().url_params
+        params.update(dict(per_page=100))
+        return params
+
+    def format_data(self, data):
+        builds = [self.format_build(build) for build in data['workflows']]
+        estimate_time(builds)
+        return dict(name=self.name, builds=builds[:4], health=health_summary(builds))
+
+    @classmethod
+    def format_build(cls, build):
+        start, finish, elapsed = elapsed_time(
+            build.get('created_at'),
+            build.get('updated_at'),
+        )
+        duration = None if start is None or finish is None else finish - start
+        commit = build.get('head_commit', {})
+        build_completed = build.get('status') == 'completed'
+        return super().format_build(dict(
+            author=commit.get('author', {}).get('name'),
+            duration=duration if build_completed else None,
+            elapsed=elapsed,
+            message=commit.get('message'),
+            outcome=build.get('conclusion') if build_completed else build.get('status'),
+            started_at=start,
+        ))
+
+
 class GitHubEnterprise(CustomRootMixin, GitHub):
     """Current status of GHE repositories."""
 
@@ -187,3 +236,9 @@ class GitHubEnterpriseIssues(CustomRootMixin, GitHubIssues):
     """Issues and pull requests from GHE repositories."""
 
     FRIENDLY_NAME = 'GitHub Issues'
+
+
+class GitHubEnterpriseActions(CustomRootMixin, GitHubActions):
+    """Actions from GHE repositories."""
+
+    FRIENDLY_NAME = 'GitHub Actions'

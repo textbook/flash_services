@@ -10,14 +10,15 @@ from .buddy import Buddy
 from .circleci import CircleCI
 from .codeship import Codeship
 from .coveralls import Coveralls
-from .github import (GitHub, GitHubEnterprise, GitHubEnterpriseIssues,
+from .github import (GitHub, GitHubActions, GitHubEnterprise,
+                     GitHubEnterpriseActions, GitHubEnterpriseIssues,
                      GitHubIssues)
 from .jenkins import Jenkins
 from .tracker import Tracker
 from .travis import TravisOS, TravisPro
 
 __author__ = 'Jonathan Sharpe'
-__version__ = '0.11.1'
+__version__ = '0.12.0'
 
 blueprint = Blueprint(
     'services',
@@ -37,6 +38,8 @@ SERVICES = dict(
     coveralls=Coveralls,
     github=GitHub,
     github_enterprise=GitHubEnterprise,
+    gh_actions=GitHubActions,
+    ghe_actions=GitHubEnterpriseActions,
     gh_issues=GitHubIssues,
     ghe_issues=GitHubEnterpriseIssues,
     jenkins=Jenkins,
