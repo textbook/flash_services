@@ -9,9 +9,9 @@ Flash Services
   :target: https://flash-services.readthedocs.io/en/latest/?badge=latest
   :alt: Documentation Status
 
-.. image:: https://travis-ci.org/textbook/flash_services.svg?branch=master
-  :target: https://travis-ci.org/textbook/flash_services
-  :alt: Travis Build Status
+.. image:: https://github.com/textbook/flash_services/actions/workflows/push.yml/badge.svg
+  :target: https://github.com/textbook/flash_services/actions/workflows/push.yml
+  :alt: GitHub Actions Build Status
 
 .. image:: https://coveralls.io/repos/github/textbook/flash_services/badge.svg?branch=master
   :target: https://coveralls.io/github/textbook/flash_services?branch=master
