@@ -203,7 +203,7 @@ class GitHubActions(GitHub, ContinuousIntegrationService):
         return params
 
     def format_data(self, data):
-        builds = [self.format_build(build) for build in data['workflows']]
+        builds = [self.format_build(build) for build in data['workflow_runs']]
         estimate_time(builds)
         return dict(name=self.name, builds=builds[:4], health=health_summary(builds))
 

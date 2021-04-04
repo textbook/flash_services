@@ -22,7 +22,7 @@ def test_update_success(service, caplog, mocked_responses):
     mocked_responses.add(
         responses.GET,
         'https://api.github.com/repos/foo/bar/actions/runs?per_page=100',
-        json=dict(total_count=0, workflows=[]),
+        json=dict(total_count=0, workflow_runs=[]),
     )
 
     result = service.update()
@@ -61,7 +61,7 @@ def test_passing_build(service, mocked_responses):
         responses.GET,
         'https://api.github.com/repos/foo/bar/actions/runs?per_page=100',
         json={
-            "workflows": [
+            "workflow_runs": [
                 {
                     "conclusion": "success",
                     "created_at": "2016-04-14T20:47:40Z",
@@ -101,7 +101,7 @@ def test_failing_build(service, mocked_responses):
         responses.GET,
         'https://api.github.com/repos/foo/bar/actions/runs?per_page=100',
         json={
-            "workflows": [
+            "workflow_runs": [
                 {
                     "conclusion": "failure",
                     "created_at": "2016-04-14T20:47:40Z",
@@ -159,7 +159,7 @@ def test_working_build(service, mocked_responses):
         responses.GET,
         'https://api.github.com/repos/foo/bar/actions/runs?per_page=100',
         json={
-            "workflows": [
+            "workflow_runs": [
                 {
                     "created_at": "2016-04-14T20:47:40Z",
                     "head_commit": {
@@ -203,7 +203,7 @@ def test_actions_enterprise_update(caplog, mocked_responses):
     mocked_responses.add(
         responses.GET,
         'http://dummy.url/repos/foo/bar/actions/runs?per_page=100',
-        json=dict(total_count=0, workflows=[]),
+        json=dict(total_count=0, workflow_runs=[]),
     )
     service = GitHubEnterpriseActions(
         username='enterprise-user',
