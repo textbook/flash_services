@@ -160,3 +160,24 @@ def test_failing_build(service, mocked_responses):
         name='foo/bar/baz [qux]',
         health='error'
     )
+
+
+def test_uses_author_name_if_available(service, mocked_responses):
+    mocked_responses.add(
+        responses.GET,
+        'https://circleci.com/api/v1.1/project/foo/bar/baz/tree/qux?limit=100&shallow=true',
+        json=[
+            {
+                "author_name": "Jane Doe",
+                "committer_name": "GitHub",
+                "subject": "I did some bad work",
+                "start_time": "2016-04-14T20:47:40Z",
+                "status": "failed",
+                "stop_time": "2016-04-14T20:57:07Z"
+            }
+        ]
+    )
+
+    result = service.update()
+
+    assert result['builds'][0]['author'] == 'Jane Doe'

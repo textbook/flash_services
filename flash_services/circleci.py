@@ -63,7 +63,7 @@ class CircleCI(HeaderMixin, ContinuousIntegrationService):
         )
         duration = None if start is None or finish is None else finish - start
         return super().format_build(dict(
-            author=build.get('committer_name'),
+            author=build.get('author_name') or build.get('committer_name'),
             duration=duration,
             elapsed=elapsed,
             message=build.get('subject'),
