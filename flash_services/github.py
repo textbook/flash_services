@@ -178,7 +178,7 @@ class GitHubIssues(ThresholdMixin, GitHub):
         return 'error'
 
 
-class GitHubActions(GitHub, ContinuousIntegrationService):
+class GitHubActions(ContinuousIntegrationService, GitHub):
     """Show the current build status on GitHub Actions."""
 
     ENDPOINT = '/repos/{repo_name}/actions/runs'

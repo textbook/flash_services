@@ -15,6 +15,7 @@ def service():
 
 def test_service_type():
     assert issubclass(GitHubActions, ContinuousIntegrationService)
+    assert GitHubActions.TEMPLATE == 'ci-section'
 
 
 def test_update_success(service, caplog, mocked_responses):
