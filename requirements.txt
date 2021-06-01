@@ -28,6 +28,6 @@ responses==0.13.2
 six==1.15.0
 soupsieve==2.2.1
 toml==0.10.2
-urllib3==1.26.4
+urllib3==1.26.5
 Werkzeug==1.0.1
 wrapt==1.12.1
