@@ -30,5 +30,5 @@ six==1.16.0
 soupsieve==2.3.1
 toml==0.10.2
 urllib3==1.26.7
-Werkzeug==2.0.2
+Werkzeug==2.2.3
 wrapt==1.13.3
